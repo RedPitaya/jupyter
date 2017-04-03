@@ -176,11 +176,11 @@ class oscilloscope (object):
 
     def clb_t_source (self, change):
         self.t_source = change['new']
-        sh   = 6*(0+2)
-        sh_t = 6*(self.t_source+2)
+        mask = 1 << (    2 + 0)
+        mtrg = 1 << (6 + 2 + self.t_source)
         # TODO: handle trigger masks
         for ch in self.channels:
-            self.osc[ch].mask = [(0x1<<sh), (0x2<<sh), (0x4<<sh), (0x8<<sh) | (0x10<<sh_t)]
+            self.osc[ch].mask = [mask, mask, mask, mask | mtrg]
         self.clb_t_update()
         self.clb_y_update()
 
@@ -242,12 +242,10 @@ class oscilloscope (object):
             self.holdoff = 0
 
             # trigger source mask
-            #sh = 6*(ch+2)
-            sh = 6*(0+2)
-            sh_t = 6*(0+2)
-            self.mask = [(0x1<<sh), (0x2<<sh), (0x4<<sh), (0x8<<sh) | (0x10<<sh_t)]
-            
-            
+            mask = 1 << (    2 + 0)
+            mtrg = 1 << (6 + 2 + 0)
+            self.mask = [mask, mask, mask, mask | mtrg]
+
             # create widgets
             self.w_t_edge     = ipw.ToggleButtons    (value=self.edge, options=['pos', 'neg'], description='T edge')
             self.w_t_position = ipw.FloatRangeSlider (value=self.level, min=-1.0, max=+1.0, step=0.02, description='T position')
