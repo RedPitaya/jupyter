@@ -1,5 +1,5 @@
 # FPGA configuration and API
-from redpitaya.drv import mercury as fpga
+from redpitaya.overlay.mercury import mercury as fpga
 
 # system and mathematics libraries
 import time
@@ -50,7 +50,7 @@ class oscilloscope (object):
 
         # this will load the FPGA
         try:
-            self.ovl = fpga.overlay("mercury")
+            self.ovl = fpga()
         except ResourceWarning:
             print ("FPGA bitstream is already loaded")
         # wait a bit for the overlay to be properly applied
