@@ -1,1 +1,1 @@
-__all__ = ['drv', 'app']
+__all__ = ['overlay', 'drv', 'app']
