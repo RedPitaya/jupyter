@@ -1,10 +1,8 @@
-import os
-import fcntl
-import mmap
-
 import numpy as np
 
-class hwid (object):
+from .uio import uio
+
+class hwid (uio):
     regset_dtype = np.dtype([
         ('hwid' , 'uint32'),
         ('rsv0' , 'uint32'),  # reserved
@@ -16,36 +14,10 @@ class hwid (object):
     ])
 
     def __init__ (self, uio:str = '/dev/uio/hwid'):
-
-        # open device file
-        try:
-            self.uio_dev = os.open(uio, os.O_RDWR | os.O_SYNC)
-        except OSError as e:
-            raise IOError(e.errno, "Opening {}: {}".format(uio, e.strerror))
-
-        # exclusive lock
-        try:
-            fcntl.flock(self.uio_dev, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except IOError as e:
-            raise IOError(e.errno, "Locking {}: {}".format(uio, e.strerror))
-
-        # map regset
-        try:
-            self.uio_reg = mmap.mmap(
-                fileno=self.uio_dev, length=mmap.PAGESIZE, offset=0x0,
-                flags=mmap.MAP_SHARED, prot=(mmap.PROT_READ | mmap.PROT_WRITE))
-        except OSError as e:
-            raise IOError(e.errno, "Mapping (regset) {}: {}".format(uio, e.strerror))
-
-        regset_array = np.recarray(1, self.regset_dtype, buf=self.uio_reg)
-        self.regset = regset_array[0]
+        super().__init__(uio)
 
     def __del__ (self):
-        self.uio_reg.close()
-        try:
-            os.close(self.uio_dev)
-        except OSError as e:
-            raise IOError(e.errno, "Closing {}: {}".format(uio, e.strerror))
+        super().__del__()
 
     @property
     def hwid (self):
