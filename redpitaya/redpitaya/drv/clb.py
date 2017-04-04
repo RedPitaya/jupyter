@@ -1,10 +1,8 @@
-import os
-import fcntl
-import mmap
-
 import numpy as np
 
-class clb (object):
+from .uio import uio
+
+class clb (uio):
     channels_adc = [0, 1]
     channels_dac = [0, 1]
 
@@ -55,39 +53,10 @@ class clb (object):
     ])
 
     def __init__ (self, uio:str = '/dev/uio/clb'):
-
-        # open device file
-        try:
-            self.uio_dev = os.open(uio, os.O_RDWR | os.O_SYNC)
-        except OSError as e:
-            raise IOError(e.errno, "Opening {}: {}".format(uio, e.strerror))
-
-        # exclusive lock
-        try:
-            fcntl.flock(self.uio_dev, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except IOError as e:
-            raise IOError(e.errno, "Locking {}: {}".format(uio, e.strerror))
-
-        # map regset
-        try:
-            self.uio_mem = mmap.mmap(
-                fileno=self.uio_dev, length=mmap.PAGESIZE, offset=0x0,
-                flags=mmap.MAP_SHARED, prot=(mmap.PROT_READ | mmap.PROT_WRITE))
-        except OSError as e:
-            raise IOError(e.errno, "Mapping {}: {}".format(uio, e.strerror))
-
-        regset_array = np.recarray(1, self.regset_dtype, buf=self.uio_mem)
-        self.regset = regset_array[0]
-
-        tmp_array = np.recarray(1, self.clb_dtype)
-        self.tmp = tmp_array[0]
+        super().__init__(uio)
 
     def __del__ (self):
-        self.uio_mem.close()
-        try:
-            os.close(self.uio_dev)
-        except OSError as e:
-            raise IOError(e.errno, "Closing {}: {}".format(uio, e.strerror))
+        super().__del__()
 
     def get_adc_gain (self, ch: int) -> float:
         return (self.regset.adc[ch].ctl_mul / self.DWA1)
