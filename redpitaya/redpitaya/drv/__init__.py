@@ -1,1 +1,1 @@
-__all__ = ['mercury', 'overlay', 'uio', 'hwid', 'pdm', 'clb', 'gen', 'osc', 'led']
+__all__ = ['mercury', 'overlay', 'uio', 'hwid', 'pdm', 'clb', 'gen', 'osc', 'led', 'gpio']
