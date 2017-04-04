@@ -1,7 +1,3 @@
-import os
-import fcntl
-import mmap
-
 import ctypes
 import math
 import numpy as np
@@ -9,7 +5,10 @@ from scipy import signal
 
 from enum import Enum
 
-class gen (object):
+from .uio import uio
+import mmap
+
+class gen (uio):
     # sampling frequency
     FS = 125000000.0
     # linear addition multiplication register width
@@ -87,32 +86,11 @@ class gen (object):
 
     def __init__ (self, index:int, uio:str = '/dev/uio/gen'):
         """Module instance index should be provided"""
-
         # use index
         uio = uio+str(index)
 
-        # open device file
-        try:
-            self.uio_dev = os.open(uio, os.O_RDWR | os.O_SYNC)
-        except OSError as e:
-            raise IOError(e.errno, "Opening {}: {}".format(uio, e.strerror))
-
-        # exclusive lock
-        try:
-            fcntl.flock(self.uio_dev, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except IOError as e:
-            raise IOError(e.errno, "Locking {}: {}".format(uio, e.strerror))
-
-        # map regset
-        try:
-            self.uio_reg = mmap.mmap(
-                fileno=self.uio_dev, length=mmap.PAGESIZE, offset=0x0,
-                flags=mmap.MAP_SHARED, prot=(mmap.PROT_READ | mmap.PROT_WRITE))
-        except OSError as e:
-            raise IOError(e.errno, "Mapping (regset) {}: {}".format(uio, e.strerror))
-
-        regset_array = np.recarray(1, self.regset_dtype, buf=self.uio_reg)
-        self.regset = regset_array[0]
+        # call parent class init to open UIO device and map regset
+        super().__init__(uio)
 
         # map buffer table
         try:
@@ -133,12 +111,8 @@ class gen (object):
         self.reset()
         # munmap
         self.uio_tbl.close()
-        self.uio_reg.close()
-        # close UIO device
-        try:
-            os.close(self.uio_dev)
-        except OSError as e:
-            raise IOError(e.errno, "Closing {}: {}".format(uio, e.strerror))
+        # call parent class init to unmap regset and close UIO device
+        super().__del__()
 
     def show_regset (self):
         print (
