@@ -32,17 +32,29 @@ class evn ():
         return (bool(self.regset.ctl_sts & self.CTL_TRG_MASK))
 
     @property
-    def mask (self) -> tuple:
-        """Enable masks for [reset, start, stop, trigger] signals"""
+    def control_mask (self) -> tuple:
+        """Enable masks for software event sources [reset, start, stop, trigger]"""
         return ([self.regset.cfg_rst,
                  self.regset.cfg_str,
                  self.regset.cfg_stp,
-                 self.regset.cfg_trg])
+                 self.regset.cfg_swt])
 
-    @mask.setter
-    def mask (self, value: tuple):
-        """Enable masks for [reset, start, stop, trigger] signals"""
+    @control_mask.setter
+    def control_mask (self, value: tuple):
+        if isinstance(value, int):
+            value = [value]*4
+        """Enable masks for software event sources [reset, start, stop, trigger]"""
         self.regset.cfg_rst = value [0]
         self.regset.cfg_str = value [1]
         self.regset.cfg_stp = value [2]
-        self.regset.cfg_trg = value [3]
+        self.regset.cfg_swt = value [3]
+
+    @property
+    def trigger_mask (self) -> int:
+        """Enable mask for hardware trigger sources"""
+        return (self.regset.cfg_trg)
+
+    @trigger_mask.setter
+    def trigger_mask (self, value: int):
+        """Enable mask for hardware trigger sources"""
+        self.regset.cfg_trg = value
