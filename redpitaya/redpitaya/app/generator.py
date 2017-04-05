@@ -67,7 +67,7 @@ class generator (object):
             super().__init__(ch)
 
             self.reset()
-            self.control_mask = [1 << (0 + ch)] * 4
+            self.control_mask = [fpga.event_masks['gen'+str(ch)]] * 4
             self.trigger_mask = 0
             self.amplitude = 0
             self.offset    = 0

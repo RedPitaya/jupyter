@@ -176,12 +176,9 @@ class oscilloscope (object):
 
     def clb_t_source (self, change):
         self.t_source = change['new']
-        mask = 1 << (    2 + 0)
-        mtrg = 1 << (2 + self.t_source)
-        # TODO: handle trigger masks
         for ch in self.channels:
-            self.osc[ch].control_mask = mask
-            self.osc[ch].trigger_mask = mtrg
+            self.osc[ch].control_mask = [fpga.event_masks['osc0']] * 4
+            self.osc[ch].trigger_mask =  fpga.event_masks['osc'+str(self.t_source)]
         self.clb_t_update()
         self.clb_y_update()
 
@@ -242,8 +239,10 @@ class oscilloscope (object):
             self.edg = 'pos'
             self.holdoff = 0
 
-            # trigger source mask
-            self.trigger_mask = 1 << (2 + 0)
+            # control event mask
+            self.control_mask = [fpga.event_masks['osc0']] * 4
+            # TODO: this default should be set in the oscilloscope application class
+            self.trigger_mask =  fpga.event_masks['osc0']
 
             # create widgets
             self.w_t_edge     = ipw.ToggleButtons    (value=self.edge, options=['pos', 'neg'], description='T edge')

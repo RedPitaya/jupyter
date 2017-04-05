@@ -12,12 +12,28 @@ from redpitaya.drv.osc     import osc
 import iio
 
 class mercury (overlay):
+    
     def __init__ (self):
         super().__init__ (overlay = 'mercury')
 
     def __del__ (self):
         super().__del__ ()
 
+    # module number constants
+    MNG = 2  # generators
+    MNO = 2  # oscilloscopes
+    
+    event_sources = ['gen'+str(ch) for ch in range(MNG)] + ['osc'+str(ch) for ch in range(MNO)] + ['lg', 'la']
+    event_masks = {'gen0': 0b000001,
+                   'gen1': 0b000010,
+                   'osc0': 0b000100,
+                   'osc1': 0b001000,
+                   'lg'  : 0b010000,
+                   'la'  : 0b100000,
+                   'gen' : 0b000011,
+                   'osc' : 0b001100,
+                   'all' : 0b111111}
+    
     class led (LED):
         leds = range(8)
 
@@ -68,9 +84,11 @@ class mercury (overlay):
         pass
 
     class gen (gen):
-        # TODO, add checks
-        pass
+        def __init__ (self, index:int):
+            super().__init__ (index = index)
+            self.event_mask = mercury.event_masks['gen'+str(index)]
 
     class osc (osc):
-        # TODO, add checks
-        pass
+        def __init__ (self, index:int, input_range:float):
+            super().__init__ (index = index, input_range = input_range)
+            self.event_mask = mercury.event_masks['osc'+str(index)]
