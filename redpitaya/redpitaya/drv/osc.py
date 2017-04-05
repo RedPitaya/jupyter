@@ -1,9 +1,11 @@
 import numpy as np
 
 import mmap
-from .uio import uio
 
-class osc (uio):
+from .uio import uio
+from .evn import evn
+
+class osc (uio, evn):
     # sampling frequency
     FS = 125000000.0
     # linear addition multiplication register width
@@ -12,11 +14,7 @@ class osc (uio):
     DWr  = (1 << (DW-1)) - 1
     # buffer parameters
     N = 2**14 # table size
-    # control register masks
-    CTL_TRG_MASK = np.uint32(1<<3) # 1 - sw trigger bit (sw trigger must be enabled)
-    CTL_STP_MASK = np.uint32(1<<2) # 1 - stop/abort; returns 1 when stopped
-    CTL_STR_MASK = np.uint32(1<<1) # 1 - start
-    CTL_RST_MASK = np.uint32(1<<0) # 1 - reset state machine so that it is in known state
+
     # trigger edge dictionary
     edges = {'positive': 0, 'negative': 1,
              'pos'     : 0, 'neg'     : 1,
@@ -129,46 +127,6 @@ class osc (uio):
             self.filter_coeficients = self.filters[value]
         else:
             raise ValueError("Input range can be one of {} volts.".format(self.ranges))
-
-    def reset (self):
-        """reset state machine"""
-        self.regset.ctl_sts = self.CTL_RST_MASK
-
-    def start (self):
-        """start acquisition"""
-        self.regset.ctl_sts = self.CTL_STR_MASK
-
-    def stop (self):
-        """stop acquisition"""
-        self.regset.ctl_sts = self.CTL_STP_MASK
-
-    def trigger (self):
-        """activate SW trigger"""
-        self.regset.ctl_sts = self.CTL_TRG_MASK
-
-    def status_run (self) -> bool:
-        """Run status"""
-        return (bool(self.regset.ctl_sts & self.CTL_STR_MASK))
-
-    def status_trigger (self) -> bool:
-        """Trigger status"""
-        return (bool(self.regset.ctl_sts & self.CTL_TRG_MASK))
-
-    @property
-    def mask (self) -> tuple:
-        """Enable masks for [reset, start, stop, trigger] signals"""
-        return ([self.regset.cfg_rst,
-                 self.regset.cfg_str,
-                 self.regset.cfg_stp,
-                 self.regset.cfg_trg])
-
-    @mask.setter
-    def mask (self, value: tuple):
-        """Enable masks for [reset, start, stop, trigger] signals"""
-        self.regset.cfg_rst = value [0]
-        self.regset.cfg_str = value [1]
-        self.regset.cfg_stp = value [2]
-        self.regset.cfg_trg = value [3]
 
     @property
     def trigger_pre (self) -> float:
