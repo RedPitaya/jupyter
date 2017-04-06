@@ -24,7 +24,7 @@ class gen (uio, evn):
     # buffer parameters
     CWM = 14  # counter width magnitude (fixed point integer)
     CWF = 16  # counter width fraction  (fixed point fraction)
-    N = 2**CWM # table size
+    buffer_size = 2**CWM # table size
 
     # logaritmic scale from 0.116Hz to 62.5Mhz
     f_min = FS / 2**(CWM+CWF)
@@ -35,7 +35,7 @@ class gen (uio, evn):
     fl_one = math.log10(f_one)
 
     # create waveforms
-    t = np.linspace(0, 2*np.pi, N, endpoint=False)
+    t = np.linspace(0, 2*np.pi, buffer_size, endpoint=False)
 
     def sine (self, t = None):
         if t is None: t = self.t
@@ -93,7 +93,7 @@ class gen (uio, evn):
         try:
             self.uio_tbl = mmap.mmap(
                 # TODO: probably the length should be rounded up to mmap.PAGESIZE
-                fileno=self.uio_dev, length=4*self.N, offset=mmap.PAGESIZE,
+                fileno=self.uio_dev, length=4*self.buffer_size, offset=mmap.PAGESIZE,
                 flags=mmap.MAP_SHARED, prot=(mmap.PROT_READ | mmap.PROT_WRITE))
         except OSError as e:
             raise IOError(e.errno, "Mapping (buffer) {}: {}".format(uio, e.strerror))
@@ -209,13 +209,13 @@ class gen (uio, evn):
     def waveform (self, value):
         # TODO check table size shape
         siz = len(value)
-        if (siz <= self.N):
+        if (siz <= self.buffer_size):
             for i in range(siz):
                 # TODO add saturation
                 self.table[i] = int(value[i] * self.DWr)
             self.regset.cfg_siz = (siz << self.CWF) - 1
         else:
-            raise ValueError("Waveform table size should not excede buffer size. N = {}".format(self.N))
+            raise ValueError("Waveform table size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
 
     class modes(Enum):
         CONTINUOUS = ctypes.c_uint32(0x0)

@@ -13,7 +13,7 @@ class osc (uio, evn):
     # fixed point range
     DWr  = (1 << (DW-1)) - 1
     # buffer parameters
-    N = 2**14 # table size
+    buffer_size = 2**14 # table size
 
     # trigger edge dictionary
     edges = {'positive': 0, 'negative': 1,
@@ -73,7 +73,7 @@ class osc (uio, evn):
         try:
             self.uio_tbl = mmap.mmap(
                 # TODO: probably the length should be rounded up to mmap.PAGESIZE
-                fileno=self.uio_dev, length=2*self.N, offset=mmap.PAGESIZE,
+                fileno=self.uio_dev, length=2*self.buffer_size, offset=mmap.PAGESIZE,
                 flags=mmap.MAP_SHARED, prot=(mmap.PROT_READ | mmap.PROT_WRITE))
         except OSError as e:
             raise IOError(e.errno, "Mapping (buffer) {}: {}".format(uio, e.strerror))
@@ -255,14 +255,14 @@ class osc (uio, evn):
         # mask out overflow bit and sum pre and post trigger counters
         cnt = ( (self.regset.sts_pre & 0x7fffffff)
               + (self.regset.sts_pst & 0x7fffffff) )
-        adr = cnt % self.N
+        adr = cnt % self.buffer_size
         return adr
 
-    def data(self, siz = N, ptr = None):
+    def data(self, siz = buffer_size, ptr = None):
         """Data containing normalized values in the range [-1,1]"""
         if ptr is None:
             ptr = int(self.pointer)
-        adr = (self.N + ptr - siz) % self.N
+        adr = (self.buffer_size + ptr - siz) % self.buffer_size
         # TODO: avoid making copy of entire array
         table = np.roll(self.table, -ptr)
         return table.astype('float32')[-siz:] * (self.__input_range / self.DWr)
