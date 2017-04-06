@@ -142,7 +142,6 @@ class gen (uio, evn):
 
     @amplitude.setter
     def amplitude (self, value: float):
-        """Output amplitude in vols"""
         # TODO: fix saturation
         if (-1.0 <= value <= 1.0):
             self.regset.cfg_mul = value * self.DWMr
@@ -156,7 +155,6 @@ class gen (uio, evn):
 
     @offset.setter
     def offset (self, value: float):
-        """Output offset in vols"""
         # TODO: fix saturation
         if (-1.0 <= value <= 1.0):
             self.regset.cfg_sum = value * self.DWSr
@@ -170,7 +168,6 @@ class gen (uio, evn):
 
     @enable.setter
     def enable (self, value: float):
-        """Output enable"""
         self.regset.cfg_ena = int(value)
 
     @property
@@ -182,7 +179,6 @@ class gen (uio, evn):
 
     @frequency.setter
     def frequency (self, value: float):
-        """Frequency in Hz"""
         if (value < self.FS/2):
             siz = self.regset.cfg_siz + 1
             self.regset.cfg_ste = int(siz * (value / self.FS)) - 1
@@ -198,7 +194,6 @@ class gen (uio, evn):
 
     @phase.setter
     def phase (self, value: float):
-        """Phase in angular degrees"""
         # TODO add range check
         siz = self.regset.cfg_siz + 1
         self.regset.cfg_off = int(siz * (value % 360) / 360)
@@ -212,7 +207,6 @@ class gen (uio, evn):
 
     @waveform.setter
     def waveform (self, value):
-        """Waveworm table containing normalized values in the range [-1,1]"""
         # TODO check table size shape
         siz = len(value)
         if (siz <= self.N):

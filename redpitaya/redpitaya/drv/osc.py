@@ -165,7 +165,6 @@ class osc (uio, evn):
 
     @level.setter
     def level (self, value: tuple):
-        """Trigger level in vols [neg, pos]"""
         scale = self.DWr / self.__input_range
         if (-1.0 <= value[0] <= 1.0):
             self.regset.cfg_neg = value[0] * scale
@@ -183,7 +182,6 @@ class osc (uio, evn):
 
     @edge.setter
     def edge (self, value: str):
-        """Trigger edge as a string 'pos'/'neg'"""
         if (value in self.edges):
             self.regset.cfg_edg = self.edges[value]
         else:
@@ -196,7 +194,6 @@ class osc (uio, evn):
 
     @holdoff.setter
     def holdoff (self, value: int):
-        """Trigger hold off time in clock periods"""
         # TODO: check range
         self.regset.cfg_hld = value
 
