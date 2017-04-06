@@ -164,6 +164,8 @@ class osc (uio, evn):
     @level.setter
     def level (self, value: tuple):
         scale = self.DWr / self.__input_range
+        if isinstance(value, float):
+            value = [value]*2
         if (-1.0 <= value[0] <= 1.0):
             self.regset.cfg_neg = value[0] * scale
         else:
