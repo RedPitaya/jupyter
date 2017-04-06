@@ -63,8 +63,8 @@ class oscilloscope (object):
         # set parameters common to all channels
         for ch in channels:
             # trigger timing is in the middle of the screen
-            self.osc[ch].regset.cfg_pre = self.size/2
-            self.osc[ch].regset.cfg_pst = self.size/2
+            self.osc[ch].trigger_pre  = self.size/2
+            self.osc[ch].trigger_post = self.size/2
 
         # default trigger source
         self.t_source = 0
@@ -87,7 +87,7 @@ class oscilloscope (object):
 
     def display (self):
         ch = 0
-        self.x = (np.arange(self.size) - self.osc[ch].regset.cfg_pre) / self.osc[ch].sample_rate
+        self.x = (np.arange(self.size) - self.osc[ch].trigger_pre) / self.osc[ch].sample_rate
         buff = [np.zeros(self.size) for ch in self.channels]
         rmax = 1.0
         
@@ -163,7 +163,7 @@ class oscilloscope (object):
 
     def clb_x_update (self):
         ch = 0
-        self.x = (np.arange(self.size) - self.osc[ch].regset.cfg_pre) / self.osc[ch].sample_rate
+        self.x = (np.arange(self.size) - self.osc[ch].trigger_pre) / self.osc[ch].sample_rate
         for ch in self.channels:
             self.r[ch].data_source.data['x'] = self.x
         self.p.x_range.start = self.x[ 0]

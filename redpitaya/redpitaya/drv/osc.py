@@ -130,32 +130,30 @@ class osc (uio, evn):
             raise ValueError("Input range can be one of {} volts.".format(self.ranges))
 
     @property
-    def trigger_pre (self) -> float:
-        return (self.regset.cfg_pre * self.sample_period)
+    def trigger_pre (self) -> int:
+        return (self.regset.cfg_pre)
 
     @trigger_pre.setter
-    def trigger_pre (self, value: float):
-        cnt = int(value / self.sample_period)
+    def trigger_pre (self, value: int):
         # TODO check range
-        self.regset.cfg_pre = cnt
+        self.regset.cfg_pre = value
 
     @property
-    def trigger_post (self) -> float:
-        return (self.regset.cfg_pst * self.sample_period)
+    def trigger_post (self) -> int:
+        return (self.regset.cfg_pst)
 
     @trigger_post.setter
-    def trigger_post (self, value: float):
-        cnt = int(value / self.sample_period)
+    def trigger_post (self, value: int):
         # TODO check range
-        self.regset.cfg_pst = cnt
+        self.regset.cfg_pst = value
 
     @property
-    def trigger_pre_status (self) -> float:
-        return (self.regset.sts_pre * self.sample_period)
+    def trigger_pre_status (self) -> int:
+        return (self.regset.sts_pre)
 
     @property
-    def trigger_post_status (self) -> float:
-        return (self.regset.sts_pst * self.sample_period)
+    def trigger_post_status (self) -> int:
+        return (self.regset.sts_pst)
 
     @property
     def level (self) -> float:
