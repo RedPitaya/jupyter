@@ -29,8 +29,7 @@ class mercury (overlay):
                    'osc0': 0b000100,
                    'osc1': 0b001000,
                    'lg'  : 0b010000,
-                   'la'  : 0b100000,
-                   'ext' : 1 << 2*6}
+                   'la'  : 0b100000}
     
     class led (LED):
         leds = range(8)
@@ -73,9 +72,14 @@ class mercury (overlay):
     class hwid (hwid):
         pass
 
-    class pdm (pdm):
-        # TODO, add checks
-        pass
+    class analog_out (pdm):
+        V = 1.8  # voltage
+
+        def read (self, ch: int) -> float:
+            return (super().read(ch) / super().DWr * self.V)
+
+        def write (self, ch: int, value: float):
+            super().write(ch, value / self.V * super().DWr)
 
     class clb (clb):
         # TODO, add checks
