@@ -32,6 +32,7 @@ class uio (object):
         self.regset = regset_array[0]
 
     def __del__ (self):
+        print ('UIO __del__ was activated.')
         self.uio_reg.close()
         try:
             self.uio_dev.close()
