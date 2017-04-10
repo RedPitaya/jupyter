@@ -1,4 +1,3 @@
-import os
 import fcntl
 import mmap
 
@@ -11,7 +10,7 @@ class uio (object):
 
         # open device file
         try:
-            self.uio_dev = os.open(uio, os.O_RDWR | os.O_SYNC)
+            self.uio_dev = open(uio, 'r+b')
         except OSError as e:
             raise IOError(e.errno, "Opening {}: {}".format(uio, e.strerror))
 
@@ -24,7 +23,7 @@ class uio (object):
         # map regset
         try:
             self.uio_reg = mmap.mmap(
-                fileno=self.uio_dev, length=mmap.PAGESIZE, offset=0x0,
+                fileno=self.uio_dev.fileno(), length=mmap.PAGESIZE, offset=0x0,
                 flags=mmap.MAP_SHARED, prot=(mmap.PROT_READ | mmap.PROT_WRITE))
         except OSError as e:
             raise IOError(e.errno, "Mapping (regset) {}: {}".format(uio, e.strerror))
@@ -35,6 +34,6 @@ class uio (object):
     def __del__ (self):
         self.uio_reg.close()
         try:
-            os.close(self.uio_dev)
+            self.uio_dev.close()
         except OSError as e:
             raise IOError(e.errno, "Closing {}: {}".format(uio, e.strerror))
