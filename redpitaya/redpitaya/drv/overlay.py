@@ -1,4 +1,5 @@
 import os
+import time
 
 class overlay (object):
     overlays = "/sys/kernel/config/device-tree/overlays"
@@ -32,6 +33,8 @@ class overlay (object):
             # TODO: loading FPGA should be handled by device tree overlay
             os.system("cat {} > /dev/xdevcfg".format(bit))
             os.system("cat {} > {}/dtbo".format(dtbo, self.syspath))
+            # this delay makes sure all devices are created before continuing
+            time.sleep(0.5)
 
     def __del__ (self):
         print ('Overlay __del__ was activated.')
