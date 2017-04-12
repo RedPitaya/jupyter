@@ -1,5 +1,5 @@
 # FPGA configuration and API
-from redpitaya.overlay.mercury import mercury as fpga
+from redpitaya.overlay.mercury import mercury as overlay
 
 # system and mathematics libraries
 import time
@@ -50,7 +50,7 @@ class oscilloscope (object):
 
         # this will load the FPGA
         try:
-            self.ovl = fpga()
+            self.ovl = overlay()
         except ResourceWarning:
             print ("FPGA bitstream is already loaded")
         # wait a bit for the overlay to be properly applied
@@ -177,8 +177,8 @@ class oscilloscope (object):
     def clb_t_source (self, change):
         self.t_source = change['new']
         for ch in self.channels:
-            self.osc[ch].control_mask = [fpga.event_masks['osc0']] * 4
-            self.osc[ch].trigger_mask =  fpga.event_masks['osc'+str(self.t_source)]
+            self.osc[ch].sync_src = [self.ovl.event_masks['osc0']] * 4
+            self.osc[ch].trig_src =  self.ovl.event_masks['osc'+str(self.t_source)]
         self.clb_t_update()
         self.clb_y_update()
 
@@ -215,7 +215,7 @@ class oscilloscope (object):
             push_notebook(handle=self.target)
             #time.sleep(0.05)
 
-    class channel (fpga.osc):
+    class channel (overlay.osc):
 
         # wigget related constants
         y_scales = [0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2]
@@ -240,9 +240,9 @@ class oscilloscope (object):
             self.holdoff = 0
 
             # control event mask
-            self.control_mask = [fpga.event_masks['osc0']] * 4
+            self.sync_src = overlay.event_masks['osc0']
+            self.trig_src = overlay.event_masks['osc0']
             # TODO: this default should be set in the oscilloscope application class
-            self.trigger_mask =  fpga.event_masks['osc0']
 
             # create widgets
             self.w_t_edge     = ipw.ToggleButtons    (value=self.edge, options=['pos', 'neg'], description='T edge')

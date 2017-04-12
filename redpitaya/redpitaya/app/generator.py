@@ -1,5 +1,5 @@
 # FPGA configuration and API
-from redpitaya.overlay.mercury import mercury as fpga
+from redpitaya.overlay.mercury import mercury as overlay
 
 # system and mathematics libraries
 import time
@@ -26,7 +26,7 @@ class generator (object):
 
         # this will load the FPGA
         try:
-            self.ovl = fpga()
+            self.ovl = overlay()
         except ResourceWarning:
             print ("FPGA bitstream is already loaded")
         # wait a bit for the overlay to be properly applied
@@ -49,7 +49,7 @@ class generator (object):
         # TODO: overlay should not be removed if a different app added it
         del (self.ovl)
 
-    class channel (fpga.gen):
+    class channel (overlay.gen):
         # waveform defaults
         form = 'sine'
         duty = 0.5
@@ -67,7 +67,7 @@ class generator (object):
             super().__init__(ch)
 
             self.reset()
-            self.control_mask = [fpga.event_masks['gen'+str(ch)]] * 4
+            self.control_mask = [overlay.event_masks['gen'+str(ch)]] * 4
             self.trigger_mask = 0
             self.amplitude = 0
             self.offset    = 0

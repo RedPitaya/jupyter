@@ -32,6 +32,9 @@ class mercury (overlay):
                    'osc1': 0b001000,
                    'lg'  : 0b010000,
                    'la'  : 0b100000}
+    # this functions are here just for some arguably user frendly redundancy
+    sync_src = event_masks
+    trig_src = event_masks
 
     class led (LED):
         leds = range(8)
@@ -89,10 +92,18 @@ class mercury (overlay):
 
     class gen (gen):
         def __init__ (self, index:int):
-            super().__init__ (index = index)
-            self.event_mask = mercury.event_masks['gen'+str(index)]
+            if index in range(MNO):
+                super().__init__ (index = index)
+                self.sync_src = mercury.event_masks['gen'+str(index)]
+                self.trig_src = mercury.event_masks['gen'+str(index)]
+            else:
+                raise ValueError("Generator index should be one of {}".format(range(MNG)))
 
     class osc (osc):
         def __init__ (self, index:int, input_range:float):
-            super().__init__ (index = index, input_range = input_range)
-            self.event_mask = mercury.event_masks['osc'+str(index)]
+            if index in range(MNO):
+                super().__init__ (index = index, input_range = input_range)
+                self.sync_src = mercury.event_masks['osc'+str(index)]
+                self.trig_src = mercury.event_masks['osc'+str(index)]
+            else:
+                raise ValueError("Oscilloscope index should be one of {}".format(range(MNO)))
