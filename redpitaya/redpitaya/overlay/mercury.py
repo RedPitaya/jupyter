@@ -23,13 +23,16 @@ class mercury (overlay):
     MNG = 2  # generators
     MNO = 2  # oscilloscopes
     
-    event_sources = ['gen'+str(ch) for ch in range(MNG)] + ['osc'+str(ch) for ch in range(MNO)] + ['lg', 'la']
+    event_sources = tuple(['gen'+str(ch) for ch in range(MNG)] + ['osc'+str(ch) for ch in range(MNO)] + ['lg', 'la'])
+    # TODO: it is unclear why the next line fails
+    #event_masks = {event_sources[i]: 1<<i for i in range(len(event_sources))}
     event_masks = {'gen0': 0b000001,
                    'gen1': 0b000010,
                    'osc0': 0b000100,
                    'osc1': 0b001000,
                    'lg'  : 0b010000,
                    'la'  : 0b100000}
+
     
     class led (LED):
         leds = range(8)

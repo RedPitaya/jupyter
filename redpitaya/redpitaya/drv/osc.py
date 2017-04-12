@@ -178,7 +178,7 @@ class osc (uio, evn):
     @property
     def edge (self) -> str:
         """Trigger edge as a string 'pos'/'neg'"""
-        return (['pos', 'neg'][self.regset.cfg_edg])
+        return (('pos', 'neg')[self.regset.cfg_edg])
 
     @edge.setter
     def edge (self, value: str):
