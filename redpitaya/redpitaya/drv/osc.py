@@ -73,7 +73,7 @@ class osc (uio, evn):
         try:
             self.uio_tbl = mmap.mmap(
                 # TODO: probably the length should be rounded up to mmap.PAGESIZE
-                fileno=self.uio_dev, length=2*self.buffer_size, offset=mmap.PAGESIZE,
+                fileno=self.uio_dev.fileno(), length=2*self.buffer_size, offset=mmap.PAGESIZE,
                 flags=mmap.MAP_SHARED, prot=(mmap.PROT_READ | mmap.PROT_WRITE))
         except OSError as e:
             raise IOError(e.errno, "Mapping (buffer) {}: {}".format(uio, e.strerror))
