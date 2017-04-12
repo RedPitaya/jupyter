@@ -33,7 +33,6 @@ class mercury (overlay):
                    'lg'  : 0b010000,
                    'la'  : 0b100000}
 
-    
     class led (LED):
         leds = range(8)
 
