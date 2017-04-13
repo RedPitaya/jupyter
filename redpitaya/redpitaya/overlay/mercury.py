@@ -95,7 +95,6 @@ class mercury (overlay):
             if index in range(mercury.MNG):
                 super().__init__ (index = index)
                 self.sync_src = mercury.event_masks['gen'+str(index)]
-                self.trig_src = mercury.event_masks['gen'+str(index)]
             else:
                 raise ValueError("Generator index should be one of {}".format(range(mercury.MNG)))
 
