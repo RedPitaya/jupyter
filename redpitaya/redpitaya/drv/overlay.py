@@ -38,9 +38,10 @@ class overlay (object):
 
     def __del__ (self):
         print ('Overlay __del__ was activated.')
-        os.system("rmdir {}".format(self.syspath))
-        del(self.syspath)
-        del(self.overlay)
+        print ('But since there are garbage collection ordering issues, this code is commented out.')
+#        os.system("rmdir {}".format(self.syspath))
+#        del(self.syspath)
+#        del(self.overlay)
 
     def status (self):
         if not os.path.exists(self.syspath):
