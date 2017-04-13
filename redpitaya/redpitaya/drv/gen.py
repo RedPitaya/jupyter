@@ -21,15 +21,19 @@ class gen (uio, evn):
     DWr  = (1 << (DW -1)) - 1
     DWMr = (1 << (DWM-2))
     DWSr = (1 << (DWS-1)) - 1
-    # buffer parameters
+    # buffer parameters (fixed point number uM.F)
     CWM = 14  # counter width magnitude (fixed point integer)
     CWF = 16  # counter width fraction  (fixed point fraction)
+    CW  = CWM + CWF
+    # buffer counter ranges
+    CWMr = 2**CWM
+    CWFr = 2**CWF
     buffer_size = 2**CWM # table size
 
     # logaritmic scale from 0.116Hz to 62.5Mhz
-    f_min = FS / 2**(CWM+CWF)
+    f_min = FS / 2**CW
     f_max = FS / 2
-    f_one = FS / 2**(CWM)
+    f_one = FS / 2**CWM
     fl_min = math.log10(f_min)
     fl_max = math.log10(f_max)
     fl_one = math.log10(f_one)
@@ -171,6 +175,35 @@ class gen (uio, evn):
         self.regset.cfg_ena = int(value)
 
     @property
+    def sample_step (self) -> float:
+        """
+        Buffer sampling (reading) step:
+        if (sample_step = 1) each sample is read exactly once,
+        if (sample_step < 1) then at least some samples are repeated,
+        if (sample_step > 1) then at least some samples are skipped.
+        """
+        return ((self.regset.cfg_ste + 1) / self.CWFr)
+
+    @sample_step.setter
+    def sample_step (self, value: float):
+        if (value < self.CWMr):
+            self.regset.cfg_ste = int(value * self.CWFr) - 1
+        else:
+            raise ValueError("Sampling step should be less then the buffer size. (sample_step < {}".format(self.CWMr))
+
+    @property
+    def sample_offset (self) -> float:
+        """Buffer sampling (reading) offset."""
+        return (self.regset.cfg_off / self.CWFr)
+
+    @sample_offset.setter
+    def sample_offset (self, value: float):
+        if (value < self.CWMr):
+            self.regset.cfg_off = int(value * self.CWFr)
+        else:
+            raise ValueError("Sampling offset should be less then the buffer size. (sample_offset < {}".format(self.CWMr))
+
+    @property
     def frequency (self) -> float:
         """Frequency in Hz"""
         siz = self.regset.cfg_siz + 1
@@ -224,12 +257,12 @@ class gen (uio, evn):
 
     @property
     def mode (self):
-        return (modes(self.regset.cfg_bst))
+        return (modes(self.regset.cfg_bmd))
 
     @mode.setter
     def mode (self, value):
         # TODO check range
-        self.regset.cfg_bst = value
+        self.regset.cfg_bmd = value
 
     @property
     def burst_repetitions (self) -> int:
