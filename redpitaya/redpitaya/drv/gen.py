@@ -251,18 +251,26 @@ class gen (uio, evn):
             raise ValueError("Waveform table size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
 
     class modes(Enum):
-        CONTINUOUS = ctypes.c_uint32(0x0)
-        BURST_FIN  = ctypes.c_uint32(0x1)
-        BURST_INF  = ctypes.c_uint32(0x3)
+        CONTINUOUS = 0x0
+        FINITE     = 0x1
+        INFINITE   = 0x3
 
     @property
-    def mode (self):
-        return (modes(self.regset.cfg_bmd))
+    def mode (self) -> str:
+        """
+        Generator mode:
+            'CONTINUOUS' - non burst mode for periodic signals
+            'FINITE'     - finite length bursts
+            'INFINITE'   - inifinite length bursts
+        """
+        return (self.modes(self.regset.cfg_bmd))
 
     @mode.setter
-    def mode (self, value):
-        # TODO check range
-        self.regset.cfg_bmd = value
+    def mode (self, value: str):
+        if isinstance(value, str):
+            self.regset.cfg_bmd = self.modes[value].value
+        else:
+            raise ValueError("Generator supports modes ['CONTINUOUS', 'FINITE', 'INFINITE']")
 
     @property
     def burst_repetitions (self) -> int:
