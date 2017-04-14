@@ -266,27 +266,27 @@ class gen (uio, evn):
 
     @property
     def burst_repetitions (self) -> int:
-        return (self.regset.cfg_bnm)
+        return (self.regset.cfg_bnm + 1)
 
     @burst_repetitions.setter
     def burst_repetitions (self, value: int):
         # TODO check range
-        self.regset.cfg_bnm = value
+        self.regset.cfg_bnm = value - 1
 
     @property
     def burst_data_len (self) -> int:
-        return (self.regset.cfg_bdl)
+        return (self.regset.cfg_bdl + 1)
 
     @burst_data_len.setter
     def burst_data_len (self, value: int):
         # TODO check range
-        self.regset.cfg_bdl = value
+        self.regset.cfg_bdl = value - 1
 
     @property
     def burst_period_len (self) -> int:
-        return (self.regset.cfg_bln)
+        return (self.regset.cfg_bln + 1)
 
     @burst_period_len.setter
     def burst_period_len (self, value: int):
         # TODO check range
-        self.regset.cfg_bln = value
+        self.regset.cfg_bln = value - 1
