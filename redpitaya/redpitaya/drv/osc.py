@@ -69,24 +69,17 @@ class osc (uio, evn):
         # call parent class init to open UIO device and map regset
         super().__init__(uio)
 
+        # map regset
+        regset_array = np.recarray(1, self.regset_dtype, buf=self.uio_mmaps[0])
+        self.regset = regset_array[0]
         # map buffer table
-        try:
-            self.uio_tbl = mmap.mmap(
-                # TODO: probably the length should be rounded up to mmap.PAGESIZE
-                fileno=self.uio_dev.fileno(), length=2*self.buffer_size, offset=mmap.PAGESIZE,
-                flags=mmap.MAP_SHARED, prot=(mmap.PROT_READ | mmap.PROT_WRITE))
-        except OSError as e:
-            raise IOError(e.errno, "Mapping (buffer) {}: {}".format(uio, e.strerror))
-
-        #table_array = np.recarray(1, self.table_dtype, buf=self.uio_tbl)
-        self.table = np.frombuffer(self.uio_tbl, 'int16')
+        self.table = np.frombuffer(self.uio_mmaps[1], 'int16')
 
         # set input range (there is no default)
         self.input_range = input_range
 
     def __del__ (self):
-        self.uio_tbl.close()
-        # call parent class init to unmap regset and close UIO device
+        # call parent class init to unmap maps and close UIO device
         super().__del__()
 
     def show_regset (self):

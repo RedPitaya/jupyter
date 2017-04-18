@@ -15,6 +15,8 @@ class hwid (uio):
 
     def __init__ (self, uio:str = '/dev/uio/hwid'):
         super().__init__(uio)
+        regset_array = np.recarray(1, self.regset_dtype, buf=self.uio_mmaps[0])
+        self.regset = regset_array[0]
 
     def __del__ (self):
         super().__del__()
