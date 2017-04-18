@@ -69,7 +69,7 @@ class generator (object):
             self.reset()
             self.control_mask = [overlay.event_masks['gen'+str(ch)]] * 4
             self.trigger_mask = 0
-            self.mode         = 0
+            self.mode         = 'CONTINUOUS'
             self.amplitude = 0
             self.offset    = 0
             self.set_waveform()
