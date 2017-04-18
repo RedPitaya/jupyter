@@ -76,4 +76,5 @@ class uio (object):
         return uio_mmap
 
     def pool(self):
+        # TODO: implement interrupt support
         pass
