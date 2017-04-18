@@ -14,6 +14,9 @@ class osc (uio, evn):
     DWr  = (1 << (DW-1)) - 1
     # buffer parameters
     buffer_size = 2**14 # table size
+    # counter size
+    CW = 31
+    CWr = 2**CW
 
     # trigger edge dictionary
     edges = {'positive': 0, 'negative': 1,
@@ -112,6 +115,7 @@ class osc (uio, evn):
 
     @property
     def input_range (self) -> float:
+        """Input range can be one of {} volts.""".format(self.ranges))
         return (self.__input_range)
 
     @input_range.setter
@@ -124,21 +128,36 @@ class osc (uio, evn):
 
     @property
     def trigger_pre (self) -> int:
+        """
+        Pre trigger delay, number of samples stored into the buffer
+        after start() before a trigger event is accepted.
+        It makes sense for this number to be up to buffer size.
+        """
         return (self.regset.cfg_pre)
 
     @trigger_pre.setter
     def trigger_pre (self, value: int):
-        # TODO check range
-        self.regset.cfg_pre = value
+        if (value < self.CWr):
+            self.regset.cfg_pre = value
+        else:
+            raise ValueError("Pre trigger delay should be less or equal to {}.".format(self.CWr))
 
     @property
     def trigger_post (self) -> int:
+        """
+        Post trigger delay, number of samples stored into the buffer
+        after a trigger, before writing stops automatically.
+        It makes sense for this number to be up to buffer size.
+        """
         return (self.regset.cfg_pst)
 
     @trigger_post.setter
     def trigger_post (self, value: int):
+        if (value < self.CWr):
+            self.regset.cfg_pst = value
+        else:
+            raise ValueError("Post trigger delay should be less or equal to {}.".format(self.CWr))
         # TODO check range
-        self.regset.cfg_pst = value
 
     @property
     def trigger_pre_status (self) -> int:
@@ -150,7 +169,7 @@ class osc (uio, evn):
 
     @property
     def level (self) -> float:
-        """Trigger level in vols [neg, pos]"""
+        """Trigger level in vols, or a pair of values [neg, pos] if a hysteresis is desired."""
         scale = self.__input_range / self.DWr
         return ([self.regset.cfg_neg * scale, self.regset.cfg_pos * scale])
 
