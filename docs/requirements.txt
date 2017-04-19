@@ -4,5 +4,6 @@ bokeh
 ipywidgets
 IPython
 pyudev
+python-periphery
 # support for http://wavedrom.com
 sphinxcontrib-wavedrom
