@@ -115,7 +115,10 @@ class osc (uio, evn):
 
     @property
     def input_range (self) -> float:
-        """Input range can be one of {} volts.""".format(self.ranges))
+        """
+        Input range can be one of the supporte ranges.
+        See HW board documentation for details.
+        """
         return (self.__input_range)
 
     @input_range.setter

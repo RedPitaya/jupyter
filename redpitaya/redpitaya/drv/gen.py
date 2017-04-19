@@ -236,7 +236,10 @@ class gen (uio, evn):
 
     @property
     def waveform (self):
-        """Waveworm array containing normalized values in the range [-1,1], and up to {} samples in length""".self.
+        """
+        Waveworm array containing normalized values in the range [-1,1],
+        up to buffer size samples in length
+        """
         siz = (self.regset.cfg_siz + 1) >> self.CWF
         # TODO: nparray
         return [self.table[i] / self.DWr for i in range(siz)]
@@ -276,7 +279,7 @@ class gen (uio, evn):
 
     @property
     def burst_repetitions (self) -> int:
-        """Number of burst sequence reperitions, up to {}""".format(self.CWNr)
+        """Number of burst sequence reperitions, up to 2**CWN"""
         return (self.regset.cfg_bnm + 1)
 
     @burst_repetitions.setter
@@ -300,7 +303,7 @@ class gen (uio, evn):
 
     @property
     def burst_period_len (self) -> int:
-        """Burst period length (data+pause)."""
+        """Burst period length (data+pause), up to 2**CWL"""
         return (self.regset.cfg_bpl + 1)
 
     @burst_period_len.setter
