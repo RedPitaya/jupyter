@@ -9,7 +9,7 @@ from redpitaya.drv.clb     import clb
 from redpitaya.drv.gen     import gen
 from redpitaya.drv.osc     import osc
 
-import iio
+#import iio
 
 class mercury (overlay):
     
@@ -57,22 +57,22 @@ class mercury (overlay):
             else:
                 super().__init__ (pin = self.ports[port] + pin, direction = direction)
 
-    class analog_in ():
-        channels = {0:'vaux8', 1:'vaux0', 2:'vaux1', 3:'vaux9'}
-        ctx = iio.Context()
-        dev = ctx.devices[3]
-        # resistor divider
-        resdiv = 4.99 / (30.0 + 4.99)
-
-        def __init__ (self, channel):
-            if channel in range(4):
-                channel = self.channels[channel]
-            self.chn   = self.dev.find_channel(channel)
-            self.scale = self.chn.attrs['scale'].value
-
-        def read(self):
-            raw = self.chn.attrs['raw'].value
-            return (int(raw)*float(self.scale)/1000 / self.resdiv)
+#    class analog_in ():
+#        channels = {0:'vaux8', 1:'vaux0', 2:'vaux1', 3:'vaux9'}
+#        ctx = iio.Context()
+#        dev = ctx.devices[3]
+#        # resistor divider
+#        resdiv = 4.99 / (30.0 + 4.99)
+#
+#        def __init__ (self, channel):
+#            if channel in range(4):
+#                channel = self.channels[channel]
+#            self.chn   = self.dev.find_channel(channel)
+#            self.scale = self.chn.attrs['scale'].value
+#
+#        def read(self):
+#            raw = self.chn.attrs['raw'].value
+#            return (int(raw)*float(self.scale)/1000 / self.resdiv)
 
     class hwid (hwid):
         pass
