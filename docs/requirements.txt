@@ -1,0 +1,6 @@
+numpy
+scipy
+bokeh
+ipywidgets
+IPython
+pyudev
