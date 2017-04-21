@@ -24,7 +24,7 @@ class pdm (uio):
         return (self.regset.pdm[channel])
 
     def write (self, channel: int, value: int):
-        if (value > self.DWr):
-            raise ValueError("PDM output value should be in range [0,{}]".format(self.DWr))
-        else:
+        if (0 <= value <= self.DWr):
             self.regset.pdm[channel] = value
+        else:
+            raise ValueError("PDM output value should be in range [0,{}]".format(self.DWr))
