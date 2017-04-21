@@ -16,8 +16,7 @@ class _uio_map (object):
             return (attr.read())
 
 class uio (object):
-    """
-    UIO class provides user space access to UIO devices.
+    """UIO class provides user space access to UIO devices.
 
     When instantiating this class the next steps are performed:
         1. The provided UIO device file is first opened.
@@ -27,21 +26,21 @@ class uio (object):
            applications from accessing the same HW module.
         3. If locking is sucessfull sysfs arguments will be read
            to determine the maps listed in the device tree.
-           All maps will be `mmapp`ed into memory and provided
+           All maps will be `mmap`ed into memory and provided
            as a tuple.
 
-    When an instance of `uio` is deleted the next steps are performed:
+    When an instance of :class:`uio` is deleted the next steps are performed:
         1. Close all memory mappings.
         2. Close the UIO device file, which also releases the exclusive lock.
 
     Parameters
     ----------
-    uio : str
+    uio : :obj:`str`
         device node path
 
     Attributes
     ----------
-    uio_mmaps : touple of `mmap` objects
+    uio_mmaps : :obj:`touple` of :class:`mmap` objects
         List of all memory maps derived from device tree node for the UIO device.
     """
 
