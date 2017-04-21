@@ -18,13 +18,34 @@ class _uio_map (object):
 class uio (object):
     """
     UIO class provides user space access to UIO devices.
+
+    When instantiating this class the next steps are performed:
+        1. The provided UIO device file is first opened.
+        2. An attempt is made to exclusively lock the device file.
+           If another process has already locked this file
+           an error will be rised. This prevents multiple
+           applications from accessing the same HW module.
+        3. If locking is sucessfull sysfs arguments will be read
+           to determine the maps listed in the device tree.
+           All maps will be `mmapp`ed into memory and provided
+           as a tuple.
+
+    When an instance of `uio` is deleted the next steps are performed:
+        1. Close all memory mappings.
+        2. Close the UIO device file, which also releases the exclusive lock.
+
+    Parameters
+    ----------
+    uio : str
+        device node path
+
+    Attributes
+    ----------
+    uio_mmaps : touple of `mmap` objects
+        List of all memory maps derived from device tree node for the UIO device.
     """
 
     def __init__(self, uio: str):
-        """
-        :param uio: device node path
-        :type uio: string
-        """
         # store UIO device node path
         self.uio_path = uio
 
@@ -41,7 +62,7 @@ class uio (object):
             raise IOError(e.errno, "Locking {}: {}".format(self.uio_path, e.strerror))
 
         # mmap all maps listed in device tree
-        self.uio_mmaps = [self._uio_mmap(uio_map) for uio_map in self._uio_maps()]
+        self.uio_mmaps = (self._uio_mmap(uio_map) for uio_map in self._uio_maps())
 
     def __del__(self):
         print('UIO __del__ was activated.')
@@ -76,5 +97,7 @@ class uio (object):
         return uio_mmap
 
     def pool(self):
-        # TODO: implement interrupt support
+        """
+        TODO: implement interrupt support
+        """
         pass
