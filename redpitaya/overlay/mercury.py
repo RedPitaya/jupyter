@@ -84,10 +84,10 @@ class mercury (overlay):
             return (super().read(ch) / super().DWr * self.V)
 
         def write (self, ch: int, value: float):
-        if (0 <= value <= self.V):
-            super().write(ch, value / self.V * super().DWr)
-        else:
-            raise ValueError("Output amplitude should be inside [0,{}] volts.".format(self.V))
+            if (0 <= value <= self.V):
+               super().write(ch, value / self.V * super().DWr)
+            else:
+               raise ValueError("Output amplitude should be inside [0,{}] volts.".format(self.V))
 
     class clb (clb):
         # TODO, add checks
