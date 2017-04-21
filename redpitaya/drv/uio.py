@@ -19,19 +19,21 @@ class uio (object):
     """UIO class provides user space access to UIO devices.
 
     When instantiating this class the next steps are performed:
-        1. The provided UIO device file is first opened.
-        2. An attempt is made to exclusively lock the device file.
-           If another process has already locked this file
-           an error will be rised. This prevents multiple
-           applications from accessing the same HW module.
-        3. If locking is sucessfull sysfs arguments will be read
-           to determine the maps listed in the device tree.
-           All maps will be `mmap`ed into memory and provided
-           as a tuple.
+
+    1. The provided UIO device file is first opened.
+    2. An attempt is made to exclusively lock the device file.
+       If another process has already locked this file
+       an error will be rised. This prevents multiple
+       applications from accessing the same HW module.
+    3. If locking is sucessfull sysfs arguments will be read
+       to determine the maps listed in the device tree.
+       All maps will be `mmap`ed into memory and provided
+       as a tuple.
 
     When an instance of :class:`uio` is deleted the next steps are performed:
-        1. Close all memory mappings.
-        2. Close the UIO device file, which also releases the exclusive lock.
+
+    1. Close all memory mappings.
+    2. Close the UIO device file, which also releases the exclusive lock.
 
     Parameters
     ----------
