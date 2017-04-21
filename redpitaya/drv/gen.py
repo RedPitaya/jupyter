@@ -59,7 +59,7 @@ class gen (uio, evn):
         if t is None: t = self.t
         return signal.sawtooth(t, width)
 
-    regset_dtype = np.dtype([
+    _regset_dtype = np.dtype([
         # control/status
         ('ctl_sts', 'uint32'),
         ('cfg_trg', 'uint32'),  # hardware trigger mask
@@ -101,7 +101,7 @@ class gen (uio, evn):
         super().__init__(uio)
 
         # map regset
-        regset_array = np.recarray(1, self.regset_dtype, buf=self.uio_mmaps[0])
+        regset_array = np.recarray(1, self._regset_dtype, buf=self.uio_mmaps[0])
         self.regset = regset_array[0]
         # map buffer table
         self.table = np.frombuffer(self.uio_mmaps[1], 'int32')

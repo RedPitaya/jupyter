@@ -11,25 +11,22 @@ class osc (uio, evn):
     # linear addition multiplication register width
     DW = 16
     # fixed point range
-    DWr  = (1 << (DW-1)) - 1
+    _DWr  = (1 << (DW-1)) - 1
     # buffer parameters
     buffer_size = 2**14 # table size
     # counter size
     CW = 31
-    CWr = 2**CW
+    _CWr = 2**CW
 
     # trigger edge dictionary
-    edges = {'positive': 0, 'negative': 1,
-             'pos'     : 0, 'neg'     : 1,
-             'p'       : 0, 'n'       : 1,
-             '+'       : 0, '-'       : 1}
+    _edges = {'pos': 0, 'neg': 1}
     # analog stage range voltages
     ranges = (1.0, 20.0)
     # filter coeficients
-    filters = { 1.0: (0x7D93, 0x437C7, 0xd9999a, 0x2666),
-               20.0: (0x4C5F, 0x2F38B, 0xd9999a, 0x2666)}
+    _filters = { 1.0: (0x7D93, 0x437C7, 0xd9999a, 0x2666),
+                20.0: (0x4C5F, 0x2F38B, 0xd9999a, 0x2666)}
 
-    regset_dtype = np.dtype([
+    _regset_dtype = np.dtype([
         # control/status
         ('ctl_sts', 'uint32'),
         ('cfg_trg', 'uint32'),  # hardware trigger mask
@@ -73,7 +70,7 @@ class osc (uio, evn):
         super().__init__(uio)
 
         # map regset
-        regset_array = np.recarray(1, self.regset_dtype, buf=self.uio_mmaps[0])
+        regset_array = np.recarray(1, self._regset_dtype, buf=self.uio_mmaps[0])
         self.regset = regset_array[0]
         # map buffer table
         self.table = np.frombuffer(self.uio_mmaps[1], 'int16')
@@ -115,8 +112,8 @@ class osc (uio, evn):
 
     @property
     def input_range (self) -> float:
-        """
-        Input range can be one of the supporte ranges.
+        """Input range can be one of the supporte ranges.
+
         See HW board documentation for details.
         """
         return (self.__input_range)
@@ -125,14 +122,15 @@ class osc (uio, evn):
     def input_range (self, value: float):
         if value in self.ranges:
             self.__input_range = value
-            self.filter_coeficients = self.filters[value]
+            self.filter_coeficients = self._filters[value]
         else:
             raise ValueError("Input range can be one of {} volts.".format(self.ranges))
 
     @property
     def trigger_pre (self) -> int:
-        """
-        Pre trigger delay, number of samples stored into the buffer
+        """Pre trigger delay.
+
+        Number of samples stored into the buffer
         after start() before a trigger event is accepted.
         It makes sense for this number to be up to buffer size.
         """
@@ -140,15 +138,16 @@ class osc (uio, evn):
 
     @trigger_pre.setter
     def trigger_pre (self, value: int):
-        if (value < self.CWr):
+        if (value < self._CWr):
             self.regset.cfg_pre = value
         else:
-            raise ValueError("Pre trigger delay should be less or equal to {}.".format(self.CWr))
+            raise ValueError("Pre trigger delay should be less or equal to {}.".format(self._CWr))
 
     @property
     def trigger_post (self) -> int:
-        """
-        Post trigger delay, number of samples stored into the buffer
+        """Post trigger delay.
+
+        Number of samples stored into the buffer
         after a trigger, before writing stops automatically.
         It makes sense for this number to be up to buffer size.
         """
@@ -156,29 +155,31 @@ class osc (uio, evn):
 
     @trigger_post.setter
     def trigger_post (self, value: int):
-        if (value < self.CWr):
+        if (value < self._CWr):
             self.regset.cfg_pst = value
         else:
-            raise ValueError("Post trigger delay should be less or equal to {}.".format(self.CWr))
+            raise ValueError("Post trigger delay should be less or equal to {}.".format(self._CWr))
         # TODO check range
 
     @property
     def trigger_pre_status (self) -> int:
+        """Pre trigger sample counter status."""
         return (self.regset.sts_pre)
 
     @property
     def trigger_post_status (self) -> int:
+        """Post trigger sample counter status."""
         return (self.regset.sts_pst)
 
     @property
     def level (self) -> float:
         """Trigger level in vols, or a pair of values [neg, pos] if a hysteresis is desired."""
-        scale = self.__input_range / self.DWr
+        scale = self.__input_range / self._DWr
         return ([self.regset.cfg_neg * scale, self.regset.cfg_pos * scale])
 
     @level.setter
     def level (self, value: tuple):
-        scale = self.DWr / self.__input_range
+        scale = self._DWr / self.__input_range
         if isinstance(value, float):
             value = [value]*2
         if (-1.0 <= value[0] <= 1.0):
@@ -197,10 +198,10 @@ class osc (uio, evn):
 
     @edge.setter
     def edge (self, value: str):
-        if (value in self.edges):
-            self.regset.cfg_edg = self.edges[value]
+        if (value in self._edges):
+            self.regset.cfg_edg = self._edges[value]
         else:
-            raise ValueError("Trigger edge should be one of {}".format(list(self.edges.keys())))
+            raise ValueError("Trigger edge should be one of {}".format(list(self._edges.keys())))
 
     @property
     def holdoff (self) -> int:
@@ -214,6 +215,7 @@ class osc (uio, evn):
 
     @property
     def decimation (self) -> int:
+        """Decimation factor."""
         return (self.regset.cfg_dec + 1)
 
     @decimation.setter
@@ -223,10 +225,12 @@ class osc (uio, evn):
 
     @property
     def sample_rate (self) -> float:
+        """Sample rate depending on decimation factor."""
         return (self.FS / self.decimation)
 
     @property
     def sample_period (self) -> float:
+        """Sample period depending on decimation factor."""
         return (1 / self.sample_rate)
 
     @property
@@ -280,4 +284,4 @@ class osc (uio, evn):
         adr = (self.buffer_size + ptr - siz) % self.buffer_size
         # TODO: avoid making copy of entire array
         table = np.roll(self.table, -ptr)
-        return table.astype('float32')[-siz:] * (self.__input_range / self.DWr)
+        return table.astype('float32')[-siz:] * (self.__input_range / self._DWr)

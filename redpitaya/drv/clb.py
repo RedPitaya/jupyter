@@ -8,41 +8,41 @@ class clb (uio):
 
     DWA = 16
     DWG = 14
-    DWAr = 2**DWA - 1
-    DWGr = 2**DWG - 1
-    DWA1 = 2**(DWA-2)
-    DWG1 = 2**(DWG-2)
+    _DWAr = 2**DWA - 1
+    _DWGr = 2**DWG - 1
+    _DWA1 = 2**(DWA-2)
+    _DWG1 = 2**(DWG-2)
     
-    MAGIC = 0xAABBCCDD
-    eeprom_device = "/sys/bus/i2c/devices/0-0050/eeprom"
-    eeprom_offset = 0x0008
+    _MAGIC = 0xAABBCCDD
+    _eeprom_device = "/sys/bus/i2c/devices/0-0050/eeprom"
+    _eeprom_offset = 0x0008
 
     # FPGA regset structure
-    regset_channel_dtype = np.dtype([
+    _regset_channel_dtype = np.dtype([
         ('ctl_mul', 'int32'),  # multiplication
         ('ctl_sum', 'int32')   # summation
     ])
     regset_dtype = np.dtype([
-        ('dac', regset_channel_dtype, 2),  # generator
-        ('adc', regset_channel_dtype, 2),  # oscilloscope
+        ('dac', _regset_channel_dtype, 2),  # generator
+        ('adc', _regset_channel_dtype, 2),  # oscilloscope
     ])
 
     # floating point structure
-    clb_channel_dtype = np.dtype([
+    _clb_channel_dtype = np.dtype([
         ('gain'  , 'float32'),  # multiplication
         ('offset', 'float32')   # summation
     ])
-    clb_range_dtype = np.dtype([
-        ('lo', clb_channel_dtype),  #  1.0V range
-        ('hi', clb_channel_dtype)   # 20.0V range
+    _clb_range_dtype = np.dtype([
+        ('lo', _clb_channel_dtype),  #  1.0V range
+        ('hi', _clb_channel_dtype)   # 20.0V range
     ])
     clb_dtype = np.dtype([
-        ('adc', clb_range_dtype  , 2),  # oscilloscope
-        ('dac', clb_channel_dtype, 2),  # generator
+        ('adc', _clb_range_dtype  , 2),  # oscilloscope
+        ('dac', _clb_channel_dtype, 2),  # generator
     ])
 
     # EEPROM structure
-    eeprom_dtype = np.dtype([
+    _eeprom_dtype = np.dtype([
         ('adc_hi_gain'  , 'uint32', 2),
         ('adc_lo_gain'  , 'uint32', 2),
         ('adc_lo_offset',  'int32', 2),
@@ -61,28 +61,28 @@ class clb (uio):
         super().__del__()
 
     def get_adc_gain (self, ch: int) -> float:
-        return (self.regset.adc[ch].ctl_mul / self.DWA1)
+        return (self.regset.adc[ch].ctl_mul / self._DWA1)
 
     def set_adc_gain (self, ch: int, gain: float):
-        self.regset.adc[ch].ctl_mul = int(gain * self.DWA1)
+        self.regset.adc[ch].ctl_mul = int(gain * self._DWA1)
 
     def get_adc_offset (self, ch: int) -> float:
-        return (self.regset.adc[ch].ctl_sum / self.DWAr)
+        return (self.regset.adc[ch].ctl_sum / self._DWAr)
 
     def set_adc_offset (self, ch: int, offset: float):
-        self.regset.adc[ch].ctl_mul = int(offset * self.DWAr)
+        self.regset.adc[ch].ctl_mul = int(offset * self._DWAr)
 
     def get_dac_gain (self, ch: int) -> float:
-        return (self.regset.dac[ch].ctl_mul / self.DWG1)
+        return (self.regset.dac[ch].ctl_mul / self._DWG1)
 
     def set_dac_gain (self, ch: int, gain: float):
-        self.regset.dac[ch].ctl_mul = int(gain * self.DWG1)
+        self.regset.dac[ch].ctl_mul = int(gain * self._DWG1)
 
     def get_dac_offset (self, ch: int) -> float:
-        return (self.regset.dac[ch].ctl_sum / self.DWGr)
+        return (self.regset.dac[ch].ctl_sum / self._DWGr)
 
     def set_dac_offset (self, ch: int, offset: float):
-        self.regset.dac[ch].ctl_mul = int(offset * self.DWGr)
+        self.regset.dac[ch].ctl_mul = int(offset * self._DWGr)
 
     def FullScaleToVoltage(self, cnt: int) -> float:
         if cnt == 0:
@@ -96,18 +96,18 @@ class clb (uio):
     def eeprom_read (self):
         # open EEPROM device
         try:
-            eeprom_file = open(self.eeprom_device, 'rb')
+            eeprom_file = open(self._eeprom_device, 'rb')
         except OSError as e:
             raise IOError(e.errno, "Opening {}: {}".format(uio, e.strerror))
 
         # seek to calibration data
         try:
-            eeprom_file.seek(self.eeprom_offset)
+            eeprom_file.seek(self._eeprom_offset)
         except IOError as e:
             raise IOError(e.errno, "Seek {}: {}".format(uio, e.strerror))
 
         try:
-            buffer = eeprom_file.read (self.eeprom_dtype.itemsize)
+            buffer = eeprom_file.read (self._eeprom_dtype.itemsize)
         except IOError as e:
             raise IOError(e.errno, "Read {}: {}".format(uio, e.strerror))
 
@@ -117,11 +117,11 @@ class clb (uio):
             raise IOError(e.errno, "Close {}: {}".format(uio, e.strerror))
 
         # map buffer onto structure
-        eeprom_array = np.recarray(1, self.eeprom_dtype, buf=buffer)
+        eeprom_array = np.recarray(1, self._eeprom_dtype, buf=buffer)
         eeprom_struct = eeprom_array[0]
     
         # missing magic number means a deprecated EEPROM structure was still not updated
-        if (eeprom_struct.magic != self.MAGIC):
+        if (eeprom_struct.magic != self._MAGIC):
             for ch in self.channels_adc:
                 eeprom_struct.adc_hi_off[ch] = eeprom_struct.adc_lo_off[ch];
 
