@@ -78,13 +78,17 @@ class generator (object):
             self.start()
             self.trigger()
 
+            fl_min = math.log10(self._f_min)
+            fl_max = math.log10(self._f_max)
+            fl_one = math.log10(self._f_one)
+
             # create widgets
             self.w_enable    = ipw.ToggleButton (value=False, description='output enable')
             self.w_waveform  = ipw.ToggleButtons(value='sine', options=['sine', 'square', 'sawtooth'], description='waveform')
             self.w_duty      = ipw.FloatSlider  (value=0.5, min=0.0, max=1.0, step=0.01, description='duty')
             self.w_amplitude = ipw.FloatSlider  (value=0, min=-1.0, max=+1.0, step=0.02, description='amplitude')
             self.w_offset    = ipw.FloatSlider  (value=0, min=-1.0, max=+1.0, step=0.02, description='offset')
-            self.w_frequency = ipw.FloatSlider  (value=self.fl_one, min=self.fl_min, max=self.fl_max, step=0.02, description='frequency')
+            self.w_frequency = ipw.FloatSlider  (value=fl_one, min=fl_min, max=fl_max, step=0.02, description='frequency')
             self.w_phase     = ipw.FloatSlider (value=0, min=0, max=360, step=1, description='phase')
 
             # style widgets

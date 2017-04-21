@@ -22,30 +22,27 @@ class gen (uio, evn):
     DWM = 14
     DWS = 14
     # fixed point range
-    DWr  = (1 << (DW -1)) - 1
-    DWMr = (1 << (DWM-2))
-    DWSr = (1 << (DWS-1)) - 1
+    _DWr  = (1 << (DW -1)) - 1
+    _DWMr = (1 << (DWM-2))
+    _DWSr = (1 << (DWS-1)) - 1
     # buffer parameters (fixed point number uM.F)
     CWM = 14  # counter width magnitude (fixed point integer)
     CWF = 16  # counter width fraction  (fixed point fraction)
     CW  = CWM + CWF
     # buffer counter ranges
-    CWMr = 2**CWM
-    CWFr = 2**CWF
+    _CWMr = 2**CWM
+    _CWFr = 2**CWF
     buffer_size = 2**CWM # table size
     # burst counter parameters
     CWL = 32  # counter width for burst length
     CWN = 16  # counter width for burst number
-    CWLr = 2**CWL
-    CWNr = 2**CWN
+    _CWLr = 2**CWL
+    _CWNr = 2**CWN
 
     # logaritmic scale from 0.116Hz to 62.5Mhz
-    f_min = FS / 2**CW
-    f_max = FS / 2
-    f_one = FS / 2**CWM
-    fl_min = math.log10(f_min)
-    fl_max = math.log10(f_max)
-    fl_one = math.log10(f_one)
+    _f_min = FS / 2**CW
+    _f_max = FS / 2
+    _f_one = FS / 2**CWM
 
     # create waveforms
     t = np.linspace(0, 2*np.pi, buffer_size, endpoint=False)
@@ -144,24 +141,24 @@ class gen (uio, evn):
     @property
     def amplitude (self) -> float:
         """Output amplitude in range [-1,1] vols."""
-        return (self.regset.cfg_mul / self.DWMr)
+        return (self.regset.cfg_mul / self._DWMr)
 
     @amplitude.setter
     def amplitude (self, value: float):
         if (-1.0 <= value <= 1.0):
-            self.regset.cfg_mul = value * self.DWMr
+            self.regset.cfg_mul = value * self._DWMr
         else:
             raise ValueError("Output amplitude should be inside [-1,1] volts.")
 
     @property
     def offset (self) -> float:
         """Output offset in range [-1,1] vols."""
-        return (self.regset.cfg_sum / self.DWSr)
+        return (self.regset.cfg_sum / self._DWSr)
 
     @offset.setter
     def offset (self, value: float):
         if (-1.0 <= value <= 1.0):
-            self.regset.cfg_sum = value * self.DWSr
+            self.regset.cfg_sum = value * self._DWSr
         else:
             raise ValueError("Output offset should be inside [-1,1] volts.")
 
@@ -176,40 +173,41 @@ class gen (uio, evn):
 
     @property
     def sample_step (self) -> float:
-        """
-        Buffer sampling (reading) step:
-          if (sample_step = 1) each sample is read exactly once,
-          if (sample_step < 1) then at least some samples are repeated,
-          if (sample_step > 1) then at least some samples are skipped.
+        """Buffer sampling (reading) step:
+
+        * if (sample_step = 1) each sample is read exactly once,
+        * if (sample_step < 1) then at least some samples are repeated,
+        * if (sample_step > 1) then at least some samples are skipped.
+
         Step should be less then the waveform array length.
         """
-        return ((self.regset.cfg_ste + 1) / self.CWFr)
+        return ((self.regset.cfg_ste + 1) / self._CWFr)
 
     @sample_step.setter
     def sample_step (self, value: float):
-        if (value < self.CWMr):
-            self.regset.cfg_ste = int(value * self.CWFr) - 1
+        if (value < self._CWMr):
+            self.regset.cfg_ste = int(value * self._CWFr) - 1
         else:
-            raise ValueError("Sampling step should be less then the buffer size. (sample_step < {}".format(self.CWMr))
+            raise ValueError("Sampling step should be less then the buffer size. (sample_step < {}".format(self._CWMr))
 
     @property
     def sample_offset (self) -> float:
-        """
-        Buffer sampling (reading) offset.
+        """Buffer sampling (reading) offset.
+
         Offset should be less then the waveform array length.
         """
-        return (self.regset.cfg_off / self.CWFr)
+        return (self.regset.cfg_off / self._CWFr)
 
     @sample_offset.setter
     def sample_offset (self, value: float):
-        if (value < self.CWMr):
-            self.regset.cfg_off = int(value * self.CWFr)
+        if (value < self._CWMr):
+            self.regset.cfg_off = int(value * self._CWFr)
         else:
-            raise ValueError("Sampling offset should be less then the buffer size. (sample_offset < {}".format(self.CWMr))
+            raise ValueError("Sampling offset should be less then the buffer size. (sample_offset < {}".format(self._CWMr))
 
     @property
     def frequency (self) -> float:
-        """Periodic signal frequency up to FS/2 = {} Hz""".format(self.FS/2)
+        """Periodic signal frequency up to FS/2"""
         siz = self.regset.cfg_siz + 1
         stp = self.regset.cfg_ste + 1
         return (stp / siz * self.FS)
@@ -236,13 +234,13 @@ class gen (uio, evn):
 
     @property
     def waveform (self):
-        """
-        Waveworm array containing normalized values in the range [-1,1],
-        up to buffer size samples in length
+        """Waveworm array containing normalized values in the range [-1,1].
+
+        Array can be up to `buffer_size` samples in length.
         """
         siz = (self.regset.cfg_siz + 1) >> self.CWF
         # TODO: nparray
-        return [self.table[i] / self.DWr for i in range(siz)]
+        return [self.table[i] / self._DWr for i in range(siz)]
 
     @waveform.setter
     def waveform (self, value):
@@ -250,7 +248,7 @@ class gen (uio, evn):
         if (siz <= self.buffer_size):
             for i in range(siz):
                 # TODO add saturation
-                self.table[i] = int(value[i] * self.DWr)
+                self.table[i] = int(value[i] * self._DWr)
             self.regset.cfg_siz = (siz << self.CWF) - 1
         else:
             raise ValueError("Waveform table size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
@@ -262,11 +260,11 @@ class gen (uio, evn):
 
     @property
     def mode (self) -> str:
-        """
-        Generator mode:
-            'CONTINUOUS' - non burst mode for periodic signals
-            'FINITE'     - finite length bursts
-            'INFINITE'   - inifinite length bursts
+        """Generator mode:
+
+        * 'CONTINUOUS' - non burst mode for periodic signals
+        * 'FINITE'     - finite length bursts
+        * 'INFINITE'   - inifinite length bursts
         """
         return (self.modes(self.regset.cfg_bmd))
 
@@ -279,15 +277,15 @@ class gen (uio, evn):
 
     @property
     def burst_repetitions (self) -> int:
-        """Number of burst sequence reperitions, up to 2**CWN"""
+        """Number of burst sequence reperitions, up to 2**`CWN`"""
         return (self.regset.cfg_bnm + 1)
 
     @burst_repetitions.setter
     def burst_repetitions (self, value: int):
-        if (value < self.CWNr):
+        if (value < self._CWNr):
             self.regset.cfg_bnm = value - 1
         else:
-            raise ValueError("Burst repetitions should be less or equal to {}.".format(self.CWNr))
+            raise ValueError("Burst repetitions should be less or equal to {}.".format(self._CWNr))
 
     @property
     def burst_data_len (self) -> int:
@@ -296,19 +294,19 @@ class gen (uio, evn):
 
     @burst_data_len.setter
     def burst_data_len (self, value: int):
-        if (value < self.CWMr):
+        if (value < self._CWMr):
             self.regset.cfg_bdl = value - 1
         else:
-            raise ValueError("Burst data length should be less or equal to {}.".format(self.CWMr))
+            raise ValueError("Burst data length should be less or equal to {}.".format(self._CWMr))
 
     @property
     def burst_period_len (self) -> int:
-        """Burst period length (data+pause), up to 2**CWL"""
+        """Burst period length (data+pause), up to 2**`CWL`"""
         return (self.regset.cfg_bpl + 1)
 
     @burst_period_len.setter
     def burst_period_len (self, value: int):
-        if (value < self.CWLr):
+        if (value < self._CWLr):
             self.regset.cfg_bpl = value - 1
         else:
-            raise ValueError("Burst period length should be less or equal to {}.".format(self.CWLr))
+            raise ValueError("Burst period length should be less or equal to {}.".format(self._CWLr))
