@@ -51,12 +51,12 @@ class generator (object):
 
     class channel (overlay.gen):
         # waveform defaults
-        form = 'sine'
+        form = 'sin'
         duty = 0.5
 
         def set_waveform (self):
-            if   self.form is 'sine':
-                self.waveform = self.sine()
+            if   self.form is 'sin':
+                self.waveform = self.sin()
             elif self.form is 'square':
                 self.waveform = self.square(self.duty)
             elif self.form is 'sawtooth':
@@ -84,7 +84,7 @@ class generator (object):
 
             # create widgets
             self.w_enable    = ipw.ToggleButton (value=False, description='output enable')
-            self.w_waveform  = ipw.ToggleButtons(value='sine', options=['sine', 'square', 'sawtooth'], description='waveform')
+            self.w_waveform  = ipw.ToggleButtons(value='sin', options=['sin', 'square', 'sawtooth'], description='waveform')
             self.w_duty      = ipw.FloatSlider  (value=0.5, min=0.0, max=1.0, step=0.01, description='duty')
             self.w_amplitude = ipw.FloatSlider  (value=0, min=-1.0, max=+1.0, step=0.02, description='amplitude')
             self.w_offset    = ipw.FloatSlider  (value=0, min=-1.0, max=+1.0, step=0.02, description='offset')
