@@ -6,7 +6,7 @@ class wave():
     def _wavetime (self):
         return (np.linspace(0, 2*np.pi, self.buffer_size, endpoint=False))
 
-    def sine (self, t: np.array = None) -> np.array:
+    def sine (self, t: ndarray = None) -> ndarray:
         """Sinus waveform.
 
         Parameters
@@ -31,7 +31,7 @@ class wave():
         if t is None: t = self._wavetime()
         return np.sin(t)
 
-    def square (self, duty: float = 0.5, t: np.array = None) -> np.array:
+    def square (self, duty: float = 0.5, t: ndarray = None) -> ndarray:
         """Square waveform.
 
         Parameters
@@ -59,7 +59,7 @@ class wave():
         if t is None: t = self._wavetime()
         return signal.square(t, duty)
 
-    def sawtooth (self, width: float = 0.5, t: np.array = None) -> np.array:
+    def sawtooth (self, width: float = 0.5, t: ndarray = None) -> ndarray:
         """Sawtooth waveform.
 
         Parameters
