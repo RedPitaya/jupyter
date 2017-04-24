@@ -1,7 +1,6 @@
 import ctypes
 import math
 import numpy as np
-from scipy import signal
 
 from enum import Enum
 
@@ -9,33 +8,34 @@ import mmap
 
 from .uio import uio
 from .evn import evn
+from .wave import wave
 
-class gen (uio, evn):
+class gen (uio, evn, wave):
     """
     Generator FPGA module driver.
     """
 
-    # sampling frequency
+    #: sampling frequency
     FS = 125000000.0
     # linear addition multiplication register width
-    DW  = 14
-    DWM = 14
-    DWS = 14
+    DW  = 14  #: data width - streaming sample
+    DWM = 14  #: data width - linear gain multiplier
+    DWS = 14  #: data width - linear offset summand
     # fixed point range
     _DWr  = (1 << (DW -1)) - 1
     _DWMr = (1 << (DWM-2))
     _DWSr = (1 << (DWS-1)) - 1
     # buffer parameters (fixed point number uM.F)
-    CWM = 14  # counter width magnitude (fixed point integer)
-    CWF = 16  # counter width fraction  (fixed point fraction)
+    CWM = 14  #: counter width - magnitude (fixed point integer)
+    CWF = 16  #: counter width - fraction  (fixed point fraction)
     CW  = CWM + CWF
     # buffer counter ranges
     _CWMr = 2**CWM
     _CWFr = 2**CWF
-    buffer_size = 2**CWM # table size
+    buffer_size = 2**CWM #: table size
     # burst counter parameters
-    CWL = 32  # counter width for burst length
-    CWN = 16  # counter width for burst number
+    CWL = 32  #: counter width - burst length
+    CWN = 16  #: counter width - burst number
     _CWLr = 2**CWL
     _CWNr = 2**CWN
 
@@ -43,21 +43,6 @@ class gen (uio, evn):
     _f_min = FS / 2**CW
     _f_max = FS / 2
     _f_one = FS / 2**CWM
-
-    # create waveforms
-    t = np.linspace(0, 2*np.pi, buffer_size, endpoint=False)
-
-    def sine (self, t = None):
-        if t is None: t = self.t
-        return np.sin(t)
-
-    def square (self, duty = 0.5, t = None):
-        if t is None: t = self.t
-        return signal.square(t, duty)
-
-    def sawtooth (self, width = 0.5, t = None):
-        if t is None: t = self.t
-        return signal.sawtooth(t, width)
 
     _regset_dtype = np.dtype([
         # control/status
