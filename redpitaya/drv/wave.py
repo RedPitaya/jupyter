@@ -26,7 +26,8 @@ class wave():
 
         See Also
         --------
-        square, sawtooth
+        self.square
+        self.sawtooth
         """
         if t is None: t = self._wavetime()
         return np.sin(t)
@@ -54,7 +55,8 @@ class wave():
 
         See Also
         --------
-        sine, sawtooth
+        self.sine
+        self.sawtooth
         """
         if t is None: t = self._wavetime()
         return signal.square(t, duty)
@@ -82,7 +84,8 @@ class wave():
 
         See Also
         --------
-        sine, square
+        self.sine
+        self.square
         """
         if t is None: t = self._wavetime()
         return signal.sawtooth(t, width)
