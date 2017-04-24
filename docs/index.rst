@@ -25,6 +25,14 @@ Events
     :undoc-members:
     :show-inheritance:
 
+Waveforms
+---------
+
+.. autoclass:: redpitaya.drv.wave.wave
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 LED
 ---
 
