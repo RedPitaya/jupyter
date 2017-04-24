@@ -63,7 +63,7 @@ class uio (object):
             raise IOError(e.errno, "Locking {}: {}".format(self.uio_path, e.strerror))
 
         # mmap all maps listed in device tree
-        self.uio_mmaps = (self._uio_mmap(uio_map) for uio_map in self._uio_maps())
+        self.uio_mmaps = [self._uio_mmap(uio_map) for uio_map in self._uio_maps()]
 
     def __del__(self):
         print('UIO __del__ was activated.')
