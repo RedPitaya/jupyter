@@ -229,8 +229,6 @@ class oscilloscope (object):
             self.ch = ch
 
             self.reset()
-            # TODO: for now bypass input filter
-            self.filter_bypass = True
             # decimation rate
             self.decimation = 1
 
