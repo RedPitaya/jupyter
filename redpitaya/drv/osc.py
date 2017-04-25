@@ -250,14 +250,13 @@ class osc (uio, evn):
         """Bypass digital input filter.
 
         True   filter is not used
-	False  filter is used
+        False  filter is used
         """
         return (bool(self.regset.cfg_byp))
 
     @filter_bypass.setter
     def filter_bypass (self, value: bool):
-        if value:  self.regset.cfg_byp = 0x1
-        else:      self.regset.cfg_mod = 0x0
+        self.regset.cfg_byp = int(value)
 
     @property
     def filter_coeficients (self) -> tuple:
