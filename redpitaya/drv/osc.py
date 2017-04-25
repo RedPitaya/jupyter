@@ -6,21 +6,20 @@ from .uio import uio
 from .evn import evn
 
 class osc (uio, evn):
-    # sampling frequency
+    #: sampling frequency
     FS = 125000000.0
-    # linear addition multiplication register width
+    #: register width - linear addition multiplication
     DW = 16
     # fixed point range
     _DWr  = (1 << (DW-1)) - 1
     # buffer parameters
-    buffer_size = 2**14 # table size
-    # counter size
-    CW = 31
+    buffer_size = 2**14 #: buffer size
+    CW = 31 #: counter size
     _CWr = 2**CW
 
     # trigger edge dictionary
     _edges = {'pos': 0, 'neg': 1}
-    # analog stage range voltages
+    #: analog stage range voltages
     ranges = (1.0, 20.0)
     # filter coeficients
     _filters = { 1.0: (0x7D93, 0x437C7, 0xd9999a, 0x2666),
@@ -83,6 +82,7 @@ class osc (uio, evn):
         super().__del__()
 
     def show_regset (self):
+        """Print FPGA module register set for debugging purposes."""
         print (
             "ctl_sts = 0x{reg:08x} = {reg:10d}  # control/status            \n".format(reg=self.regset.ctl_sts)+
             "cfg_trg = 0x{reg:08x} = {reg:10d}  # HW trigger mask           \n".format(reg=self.regset.cfg_trg)+
@@ -247,6 +247,11 @@ class osc (uio, evn):
 
     @property
     def filter_bypass (self) -> bool:
+        """Bypass digital input filter.
+
+        True   filter is not used
+	False  filter is used
+        """
         return (bool(self.regset.cfg_byp))
 
     @filter_bypass.setter
@@ -277,8 +282,25 @@ class osc (uio, evn):
         adr = cnt % self.buffer_size
         return adr
 
-    def data(self, siz = buffer_size, ptr = None):
-        """Data containing normalized values in the range [-1,1]"""
+    def data(self, siz: int = buffer_size, ptr: int = None) -> np.array:
+        """Data.
+
+        Parameters
+        ----------
+        siz : int, optional
+            Number of data samples to be read from the FPGA buffer.
+        ptr : int, optional
+            End of data pointer, only use if you understand
+            the source code.
+
+        Returns
+        -------
+        array
+            Array containing float samples scaled
+            to the selected analog range.
+            The data is alligned at the end to the last sample
+            stored into the buffer.
+        """
         if ptr is None:
             ptr = int(self.pointer)
         adr = (self.buffer_size + ptr - siz) % self.buffer_size

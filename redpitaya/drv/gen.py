@@ -76,7 +76,7 @@ class gen (uio, evn, wave):
         ('cfg_ena', 'uint32')   # output enable
     ])
 
-    def __init__ (self, index:int, uio:str = '/dev/uio/gen'):
+    def __init__ (self, index: int, uio: str = '/dev/uio/gen'):
         """Module instance index should be provided"""
 
         # use index
@@ -100,6 +100,7 @@ class gen (uio, evn, wave):
         super().__del__()
 
     def show_regset (self):
+        """Print FPGA module register set for debugging purposes."""
         print (
             "ctl_sts = 0x{reg:08x} = {reg:10d}  # control/status                 \n".format(reg=self.regset.ctl_sts)+
             "cfg_trg = 0x{reg:08x} = {reg:10d}  # HW trigger mask                \n".format(reg=self.regset.cfg_trg)+
