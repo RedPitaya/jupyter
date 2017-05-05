@@ -73,7 +73,7 @@ class generator (object):
             self.amplitude = 0
             self.offset    = 0
             self.set_waveform()
-            self.frequency = self.f_one
+            self.frequency = self._f_one
             self.phase     = 0
             self.start()
             self.trigger()
