@@ -34,8 +34,10 @@ class gen (uio, evn, wave):
     _CWFr = 2**CWF
     buffer_size = 2**CWM #: table size
     # burst counter parameters
-    CWL = 32  #: counter width - burst length
-    CWN = 16  #: counter width - burst number
+    CWR = 14  #: counter width - burst data repetition
+    CWL = 32  #: counter width - burst period length
+    CWN = 16  #: counter width - burst period number
+    _CWRr = 2**CWR
     _CWLr = 2**CWL
     _CWNr = 2**CWN
 
