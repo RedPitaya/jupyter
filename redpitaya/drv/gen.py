@@ -56,16 +56,17 @@ class gen (uio, evn, wave):
         ('cfg_str', 'uint32'),  # start
         ('cfg_stp', 'uint32'),  # stop
         ('cfg_swt', 'uint32'),  # trigger
-        # buffer configuration
+        # generator mode
+        ('cfg_bmd', 'uint32'),  # mode [1:0] = [inf, ben]
+        # continuous/periodic configuration
         ('cfg_siz', 'uint32'),  # size
         ('cfg_off', 'uint32'),  # offset
         ('cfg_ste', 'uint32'),  # step
-        ('rsv_002', 'uint32', 1),
-        # burst mode
-        ('cfg_bmd', 'uint32'),  # mode [1:0] = [inf, ben]
+        # burst configuration
+        ('cfg_bdr', 'uint32'),  # burst data   repetitions
         ('cfg_bdl', 'uint32'),  # burst data   length
         ('cfg_bpl', 'uint32'),  # burst period length (data+pause)
-        ('cfg_bnm', 'uint32'),  # number of bursts pulses
+        ('cfg_bpn', 'uint32'),  # burst period number
         # burst status
         ('sts_bln', 'uint32'),  # length (current position inside burst length)
         ('sts_bnm', 'uint32'),  # number (current burst counter)
@@ -110,13 +111,14 @@ class gen (uio, evn, wave):
             "cfg_str = 0x{reg:08x} = {reg:10d}  # mask start                     \n".format(reg=self.regset.cfg_str)+
             "cfg_stp = 0x{reg:08x} = {reg:10d}  # mask stop                      \n".format(reg=self.regset.cfg_stp)+
             "cfg_swt = 0x{reg:08x} = {reg:10d}  # mask trigger                   \n".format(reg=self.regset.cfg_swt)+
+            "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg=self.regset.cfg_bmd)+
             "cfg_siz = 0x{reg:08x} = {reg:10d}  # table size                     \n".format(reg=self.regset.cfg_siz)+
             "cfg_off = 0x{reg:08x} = {reg:10d}  # table offset                   \n".format(reg=self.regset.cfg_off)+
             "cfg_ste = 0x{reg:08x} = {reg:10d}  # table step                     \n".format(reg=self.regset.cfg_ste)+
-            "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg=self.regset.cfg_bmd)+
+            "cfg_bdr = 0x{reg:08x} = {reg:10d}  # burst data   repetition        \n".format(reg=self.regset.cfg_bdr)+
             "cfg_bdl = 0x{reg:08x} = {reg:10d}  # burst data   length            \n".format(reg=self.regset.cfg_bdl)+
             "cfg_bpl = 0x{reg:08x} = {reg:10d}  # burst period length            \n".format(reg=self.regset.cfg_bpl)+
-            "cfg_bnm = 0x{reg:08x} = {reg:10d}  # burst number of bursts pulses  \n".format(reg=self.regset.cfg_bnm)+
+            "cfg_bpn = 0x{reg:08x} = {reg:10d}  # burst period number            \n".format(reg=self.regset.cfg_bpn)+
             "sts_bln = 0x{reg:08x} = {reg:10d}  # burst length (current position)\n".format(reg=self.regset.sts_bln)+
             "sts_bnm = 0x{reg:08x} = {reg:10d}  # burst number (current counter) \n".format(reg=self.regset.sts_bnm)+
             "cfg_mul = 0x{reg:08x} = {reg:10d}  # multiplier (amplitude)         \n".format(reg=self.regset.cfg_mul)+
@@ -156,25 +158,6 @@ class gen (uio, evn, wave):
     @enable.setter
     def enable (self, value: bool):
         self.regset.cfg_ena = int(value)
-
-    @property
-    def sample_step (self) -> float:
-        """Buffer sampling (reading) step:
-
-        * if (sample_step = 1) each sample is read exactly once,
-        * if (sample_step < 1) then at least some samples are repeated,
-        * if (sample_step > 1) then at least some samples are skipped.
-
-        Step should be less then the waveform array length.
-        """
-        return ((self.regset.cfg_ste + 1) / self._CWFr)
-
-    @sample_step.setter
-    def sample_step (self, value: float):
-        if (value < self._CWMr):
-            self.regset.cfg_ste = int(value * self._CWFr) - 1
-        else:
-            raise ValueError("Sampling step should be less then the buffer size. (sample_step < {}".format(self._CWMr))
 
     @property
     def sample_offset (self) -> float:
@@ -248,8 +231,8 @@ class gen (uio, evn, wave):
     def mode (self) -> str:
         """Generator mode:
 
-        * 'CONTINUOUS' - non burst mode for periodic signals
-        * 'FINITE'     - finite length bursts
+        * 'CONTINUOUS' - non burst mode for continuous/periodic signals
+        * 'FINITE'     - finite    length bursts
         * 'INFINITE'   - inifinite length bursts
         """
         return (self.modes(self.regset.cfg_bmd))
@@ -262,37 +245,49 @@ class gen (uio, evn, wave):
             raise ValueError("Generator supports modes ['CONTINUOUS', 'FINITE', 'INFINITE'].")
 
     @property
-    def burst_repetitions (self) -> int:
-        """Number of burst sequence reperitions, up to 2**`CWN`"""
-        return (self.regset.cfg_bnm + 1)
+    def burst_data_repetitions (self) -> int:
+        """Burst data repetitions, up to 2**`CWL`."""
+        return (self.regset.cfg_bdr + 1)
 
-    @burst_repetitions.setter
-    def burst_repetitions (self, value: int):
-        if (value < self._CWNr):
-            self.regset.cfg_bnm = value - 1
+    @burst_data_repetitions.setter
+    def burst_data_repetitions (self, value: int):
+        if (value < self._CWRr):
+            self.regset.cfg_bdr = value - 1
         else:
-            raise ValueError("Burst repetitions should be less or equal to {}.".format(self._CWNr))
+            raise ValueError("Burst data repetitions should be less or equal to {}.".format(self._CWRr))
 
     @property
-    def burst_data_len (self) -> int:
-        """Burst data length, up to waveform array size, if sample step is 1.0."""
+    def burst_data_length (self) -> int:
+        """Burst data length, up to waveform array size."""
         return (self.regset.cfg_bdl + 1)
 
-    @burst_data_len.setter
-    def burst_data_len (self, value: int):
+    @burst_data_length.setter
+    def burst_data_length (self, value: int):
         if (value < self._CWMr):
             self.regset.cfg_bdl = value - 1
         else:
             raise ValueError("Burst data length should be less or equal to {}.".format(self._CWMr))
 
     @property
-    def burst_period_len (self) -> int:
-        """Burst period length (data+pause), up to 2**`CWL`"""
+    def burst_period_length (self) -> int:
+        """Burst period length (data+pause), up to 2**`CWL`."""
         return (self.regset.cfg_bpl + 1)
 
-    @burst_period_len.setter
-    def burst_period_len (self, value: int):
+    @burst_period_length.setter
+    def burst_period_length (self, value: int):
         if (value < self._CWLr):
             self.regset.cfg_bpl = value - 1
         else:
             raise ValueError("Burst period length should be less or equal to {}.".format(self._CWLr))
+
+    @property
+    def burst_period_number (self) -> int:
+        """Number of burst period reperitions, up to 2**`CWN`."""
+        return (self.regset.cfg_bpn + 1)
+
+    @burst_period_number.setter
+    def burst_period_number (self, value: int):
+        if (value < self._CWNr):
+            self.regset.cfg_bpn = value - 1
+        else:
+            raise ValueError("Burst period number should be less or equal to {}.".format(self._CWNr))
