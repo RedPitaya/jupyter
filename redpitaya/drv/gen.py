@@ -49,15 +49,9 @@ class gen (uio, evn, wave):
     _regset_dtype = np.dtype([
         # control/status
         ('ctl_sts', 'uint32'),
+        ('cfg_evn', 'uint32'),  # software event source select
         ('cfg_trg', 'uint32'),  # hardware trigger mask
-        # interrupt enable/status
-        ('irq_ena', 'uint32'),  # enable
-        ('irq_sts', 'uint32'),  # status/clear
-        # software event reset/start/stop/trigger masks
-        ('cfg_rst', 'uint32'),  # reset
-        ('cfg_str', 'uint32'),  # start
-        ('cfg_stp', 'uint32'),  # stop
-        ('cfg_swt', 'uint32'),  # trigger
+        ('rsv_000', 'uint32', 1),
         # generator mode
         ('cfg_bmd', 'uint32'),  # mode [1:0] = [inf, ben]
         # continuous/periodic configuration
@@ -72,7 +66,7 @@ class gen (uio, evn, wave):
         # burst status
         ('sts_bln', 'uint32'),  # length (current position inside burst length)
         ('sts_bnm', 'uint32'),  # number (current burst counter)
-        ('rsv_003', 'uint32', 2),
+        ('rsv_001', 'uint32', 2),
         # linear transformation
         ('cfg_mul',  'int32'),  # multiplier (amplitude)
         ('cfg_sum',  'int32'),  # adder (offset)
@@ -106,13 +100,8 @@ class gen (uio, evn, wave):
         """Print FPGA module register set for debugging purposes."""
         print (
             "ctl_sts = 0x{reg:08x} = {reg:10d}  # control/status                 \n".format(reg=self.regset.ctl_sts)+
-            "cfg_trg = 0x{reg:08x} = {reg:10d}  # HW trigger mask                \n".format(reg=self.regset.cfg_trg)+
-            "irq_ena = 0x{reg:08x} = {reg:10d}  # interrupt enable               \n".format(reg=self.regset.irq_ena)+
-            "irq_sts = 0x{reg:08x} = {reg:10d}  # interrupt status               \n".format(reg=self.regset.irq_sts)+
-            "cfg_rst = 0x{reg:08x} = {reg:10d}  # mask reset                     \n".format(reg=self.regset.cfg_rst)+
-            "cfg_str = 0x{reg:08x} = {reg:10d}  # mask start                     \n".format(reg=self.regset.cfg_str)+
-            "cfg_stp = 0x{reg:08x} = {reg:10d}  # mask stop                      \n".format(reg=self.regset.cfg_stp)+
-            "cfg_swt = 0x{reg:08x} = {reg:10d}  # mask trigger                   \n".format(reg=self.regset.cfg_swt)+
+            "cfg_evn = 0x{reg:08x} = {reg:10d}  # software event source select   \n".format(reg=self.regset.cfg_rst)+
+            "cfg_trg = 0x{reg:08x} = {reg:10d}  # hardware trigger mask          \n".format(reg=self.regset.cfg_trg)+
             "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg=self.regset.cfg_bmd)+
             "cfg_siz = 0x{reg:08x} = {reg:10d}  # table size                     \n".format(reg=self.regset.cfg_siz)+
             "cfg_off = 0x{reg:08x} = {reg:10d}  # table offset                   \n".format(reg=self.regset.cfg_off)+

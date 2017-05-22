@@ -67,8 +67,8 @@ class generator (object):
             super().__init__(ch)
 
             self.reset()
-            self.control_mask = [overlay.event_masks['gen'+str(ch)]] * 4
-            self.trigger_mask = 0
+            self.sync_src = [overlay.sync_src['gen'+str(ch)]] * 4
+            self.trig_src = 0
             self.mode         = 'CONTINUOUS'
             self.amplitude = 0
             self.offset    = 0

@@ -27,16 +27,9 @@ class osc (uio, evn):
 
     _regset_dtype = np.dtype([
         # control/status
-        ('ctl_sts', 'uint32'),
+        ('cfg_evn', 'uint32'),  # software event source select
         ('cfg_trg', 'uint32'),  # hardware trigger mask
-        # interrupt enable/status
-        ('irq_ena', 'uint32'),  # enable
-        ('irq_sts', 'uint32'),  # status/clear
-        # software event reset/start/stop/trigger masks
-        ('cfg_rst', 'uint32'),  # reset
-        ('cfg_str', 'uint32'),  # start
-        ('cfg_stp', 'uint32'),  # stop
-        ('cfg_swt', 'uint32'),  # trigger
+        ('rsv_000', 'uint32', 1),
         # pre/post trigger counters
         ('cfg_pre', 'uint32'),  # configuration pre  trigger
         ('cfg_pst', 'uint32'),  # configuration post trigger
@@ -85,13 +78,8 @@ class osc (uio, evn):
         """Print FPGA module register set for debugging purposes."""
         print (
             "ctl_sts = 0x{reg:08x} = {reg:10d}  # control/status            \n".format(reg=self.regset.ctl_sts)+
+            "cfg_evn = 0x{reg:08x} = {reg:10d}  # SW event source select    \n".format(reg=self.regset.cfg_rst)+
             "cfg_trg = 0x{reg:08x} = {reg:10d}  # HW trigger mask           \n".format(reg=self.regset.cfg_trg)+
-            "irq_ena = 0x{reg:08x} = {reg:10d}  # interrupt enable          \n".format(reg=self.regset.irq_ena)+
-            "irq_sts = 0x{reg:08x} = {reg:10d}  # interrupt status          \n".format(reg=self.regset.irq_sts)+
-            "cfg_rst = 0x{reg:08x} = {reg:10d}  # mask reset                \n".format(reg=self.regset.cfg_rst)+
-            "cfg_str = 0x{reg:08x} = {reg:10d}  # mask start                \n".format(reg=self.regset.cfg_str)+
-            "cfg_stp = 0x{reg:08x} = {reg:10d}  # mask stop                 \n".format(reg=self.regset.cfg_stp)+
-            "cfg_swt = 0x{reg:08x} = {reg:10d}  # mask trigger              \n".format(reg=self.regset.cfg_swt)+
             "cfg_pre = 0x{reg:08x} = {reg:10d}  # delay pre  trigger        \n".format(reg=self.regset.cfg_pre)+
             "cfg_pst = 0x{reg:08x} = {reg:10d}  # delay post trigger        \n".format(reg=self.regset.cfg_pst)+
             "sts_pre = 0x{reg:08x} = {reg:10d}  # status pre  trigger       \n".format(reg=self.regset.sts_pre)+

@@ -20,21 +20,32 @@ class mercury (overlay):
         super().__del__ ()
 
     # module number constants
-    MNG = 2  # generators
-    MNO = 2  # oscilloscopes
+    _MNG = 2  # generators
+    _MNO = 2  # oscilloscopes
     
-    event_sources = tuple(['gen'+str(ch) for ch in range(MNG)] + ['osc'+str(ch) for ch in range(MNO)] + ['lg', 'la'])
+    _modules = tuple(['gen'+str(ch) for ch in range(_MNG)] + ['osc'+str(ch) for ch in range(_MNO)] + ['lg', 'la'])
     # TODO: it is unclear why the next line fails
-    #event_masks = {event_sources[i]: 1<<i for i in range(len(event_sources))}
-    event_masks = {'gen0': 0b000001,
-                   'gen1': 0b000010,
-                   'osc0': 0b000100,
-                   'osc1': 0b001000,
-                   'lg'  : 0b010000,
-                   'la'  : 0b100000}
-    # this functions are here just for some arguably user frendly redundancy
-    sync_src = event_masks
-    trig_src = event_masks
+    #sync_src = {event_sources[i]:            i  for i in range(len(_modules))}
+    #trig_src = {event_sources[i]: 0b01 << (2*i) for i in range(len(_modules))}
+    #last_src = {event_sources[i]: 0b10 << (2*i) for i in range(len(_modules))}
+    sync_src = {'gen0': 0,
+                'gen1': 1,
+                'osc0': 2,
+                'osc1': 3,
+                'lg'  : 4,
+                'la'  : 5}
+    trig_src = {'gen0': 0b000000000001,
+                'gen1': 0b000000000100,
+                'osc0': 0b000000010000,
+                'osc1': 0b000001000000,
+                'lg'  : 0b000100000000,
+                'la'  : 0b010000000000}
+    last_src = {'gen0': 0b000000000010,
+                'gen1': 0b000000001000,
+                'osc0': 0b000000100000,
+                'osc1': 0b000010000000,
+                'lg'  : 0b001000000000,
+                'la'  : 0b100000000000}
 
     class led (LED):
         leds = range(8)
@@ -97,7 +108,7 @@ class mercury (overlay):
         def __init__ (self, index:int):
             if index in range(mercury.MNG):
                 super().__init__ (index = index)
-                self.sync_src = mercury.event_masks['gen'+str(index)]
+                self.sync_src = mercury.sync_src['gen'+str(index)]
             else:
                 raise ValueError("Generator index should be one of {}".format(range(mercury.MNG)))
 
@@ -105,7 +116,7 @@ class mercury (overlay):
         def __init__ (self, index:int, input_range:float):
             if index in range(mercury.MNO):
                 super().__init__ (index = index, input_range = input_range)
-                self.sync_src = mercury.event_masks['osc'+str(index)]
-                self.trig_src = mercury.event_masks['osc'+str(index)]
+                self.sync_src = mercury.sync_src['osc'+str(index)]
+                self.trig_src = mercury.trig_src['osc'+str(index)]
             else:
                 raise ValueError("Oscilloscope index should be one of {}".format(range(mercury.MNO)))
