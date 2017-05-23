@@ -19,10 +19,10 @@ class clb (uio):
 
     # FPGA regset structure
     _regset_channel_dtype = np.dtype([
-        ('ctl_mul', 'int32'),  # multiplication
-        ('ctl_sum', 'int32')   # summation
+        ('cfg_mul', 'int32'),  # multiplication
+        ('cfg_sum', 'int32')   # summation
     ])
-    regset_dtype = np.dtype([
+    _regset_dtype = np.dtype([
         ('dac', _regset_channel_dtype, 2),  # generator
         ('adc', _regset_channel_dtype, 2),  # oscilloscope
     ])
@@ -54,7 +54,7 @@ class clb (uio):
 
     def __init__ (self, uio:str = '/dev/uio/clb'):
         super().__init__(uio)
-        regset_array = np.recarray(1, self.regset_dtype, buf=self.uio_mmaps[0])
+        regset_array = np.recarray(1, self._regset_dtype, buf=self.uio_mmaps[0])
         self.regset = regset_array[0]
 
     def __del__ (self):
@@ -63,38 +63,38 @@ class clb (uio):
     @property
     def adc_gain (self, ch: int) -> float:
         """ADC gain calibration."""
-        return (self.regset.adc[ch].ctl_mul / self._DWA1)
+        return (self.regset.adc[ch].cfg_mul / self._DWA1)
 
     @adc_gain.setter
     def adc_gain (self, ch: int, gain: float):
-        self.regset.adc[ch].ctl_mul = int(gain * self._DWA1)
+        self.regset.adc[ch].cfg_mul = int(gain * self._DWA1)
 
     @property
     def adc_offset (self, ch: int) -> float:
         """ADC offset calibration."""
-        return (self.regset.adc[ch].ctl_sum / self._DWAr)
+        return (self.regset.adc[ch].cfg_sum / self._DWAr)
 
     @adc_offset.setter
     def adc_offset (self, ch: int, offset: float):
-        self.regset.adc[ch].ctl_mul = int(offset * self._DWAr)
+        self.regset.adc[ch].cfg_mul = int(offset * self._DWAr)
 
     @property
     def dac_gain (self, ch: int) -> float:
         """DAC gain calibration."""
-        return (self.regset.dac[ch].ctl_mul / self._DWG1)
+        return (self.regset.dac[ch].cfg_mul / self._DWG1)
 
     @dac_gain.setter
     def dac_gain (self, ch: int, gain: float):
-        self.regset.dac[ch].ctl_mul = int(gain * self._DWG1)
+        self.regset.dac[ch].cfg_mul = int(gain * self._DWG1)
 
     @property
     def dac_offset (self, ch: int) -> float:
         """DAC offset calibration."""
-        return (self.regset.dac[ch].ctl_sum / self._DWGr)
+        return (self.regset.dac[ch].cfg_sum / self._DWGr)
 
     @dac_offset.setter
     def dac_offset (self, ch: int, offset: float):
-        self.regset.dac[ch].ctl_mul = int(offset * self._DWGr)
+        self.regset.dac[ch].cfg_mul = int(offset * self._DWGr)
 
     def FullScaleToVoltage(self, cnt: int) -> float:
         if cnt == 0:
