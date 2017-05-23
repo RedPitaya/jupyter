@@ -27,6 +27,7 @@ class osc (uio, evn):
 
     _regset_dtype = np.dtype([
         # control/status
+        ('ctl_sts', 'uint32'),
         ('cfg_evn', 'uint32'),  # software event source select
         ('cfg_trg', 'uint32'),  # hardware trigger mask
         ('rsv_000', 'uint32', 1),
