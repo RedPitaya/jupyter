@@ -60,28 +60,40 @@ class clb (uio):
     def __del__ (self):
         super().__del__()
 
-    def get_adc_gain (self, ch: int) -> float:
+    @property
+    def adc_gain (self, ch: int) -> float:
+        """ADC gain calibration."""
         return (self.regset.adc[ch].ctl_mul / self._DWA1)
 
-    def set_adc_gain (self, ch: int, gain: float):
+    @adc_gain.setter
+    def adc_gain (self, ch: int, gain: float):
         self.regset.adc[ch].ctl_mul = int(gain * self._DWA1)
 
-    def get_adc_offset (self, ch: int) -> float:
+    @property
+    def adc_offset (self, ch: int) -> float:
+        """ADC offset calibration."""
         return (self.regset.adc[ch].ctl_sum / self._DWAr)
 
-    def set_adc_offset (self, ch: int, offset: float):
+    @adc_offset.setter
+    def adc_offset (self, ch: int, offset: float):
         self.regset.adc[ch].ctl_mul = int(offset * self._DWAr)
 
-    def get_dac_gain (self, ch: int) -> float:
+    @property
+    def dac_gain (self, ch: int) -> float:
+        """DAC gain calibration."""
         return (self.regset.dac[ch].ctl_mul / self._DWG1)
 
-    def set_dac_gain (self, ch: int, gain: float):
+    @dac_gain.setter
+    def dac_gain (self, ch: int, gain: float):
         self.regset.dac[ch].ctl_mul = int(gain * self._DWG1)
 
-    def get_dac_offset (self, ch: int) -> float:
+    @property
+    def dac_offset (self, ch: int) -> float:
+        """DAC offset calibration."""
         return (self.regset.dac[ch].ctl_sum / self._DWGr)
 
-    def set_dac_offset (self, ch: int, offset: float):
+    @dac_offset.setter
+    def dac_offset (self, ch: int, offset: float):
         self.regset.dac[ch].ctl_mul = int(offset * self._DWGr)
 
     def FullScaleToVoltage(self, cnt: int) -> float:
