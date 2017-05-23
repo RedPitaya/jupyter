@@ -106,17 +106,17 @@ class mercury (overlay):
 
     class gen (gen):
         def __init__ (self, index:int):
-            if index in range(mercury.MNG):
+            if index in range(mercury._MNG):
                 super().__init__ (index = index)
                 self.sync_src = mercury.sync_src['gen'+str(index)]
             else:
-                raise ValueError("Generator index should be one of {}".format(range(mercury.MNG)))
+                raise ValueError("Generator index should be one of {}".format(range(mercury._MNG)))
 
     class osc (osc):
         def __init__ (self, index:int, input_range:float):
-            if index in range(mercury.MNO):
+            if index in range(mercury._MNO):
                 super().__init__ (index = index, input_range = input_range)
                 self.sync_src = mercury.sync_src['osc'+str(index)]
                 self.trig_src = mercury.trig_src['osc'+str(index)]
             else:
-                raise ValueError("Oscilloscope index should be one of {}".format(range(mercury.MNO)))
+                raise ValueError("Oscilloscope index should be one of {}".format(range(mercury._MNO)))
