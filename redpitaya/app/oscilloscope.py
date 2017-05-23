@@ -177,8 +177,8 @@ class oscilloscope (object):
     def clb_t_source (self, change):
         self.t_source = change['new']
         for ch in self.channels:
-            self.osc[ch].sync_src = [self.ovl.sync_src['osc0']] * 4
-            self.osc[ch].trig_src =  self.ovl.trig_src['osc'+str(self.t_source)]
+            self.osc[ch].sync_src = self.ovl.sync_src['osc0']
+            self.osc[ch].trig_src = self.ovl.trig_src['osc'+str(self.t_source)]
         self.clb_t_update()
         self.clb_y_update()
 

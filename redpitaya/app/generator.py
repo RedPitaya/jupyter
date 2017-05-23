@@ -67,7 +67,7 @@ class generator (object):
             super().__init__(ch)
 
             self.reset()
-            self.sync_src = [overlay.sync_src['gen'+str(ch)]] * 4
+            self.sync_src = overlay.sync_src['gen'+str(ch)]
             self.trig_src = 0
             self.mode         = 'CONTINUOUS'
             self.amplitude = 0
