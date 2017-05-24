@@ -8,7 +8,8 @@ class clb (uio):
 
     _MAGIC = 0xAABBCCDD
     _eeprom_device = "/sys/bus/i2c/devices/0-0050/eeprom"
-    _eeprom_offset = 0x0008
+    _eeprom_offset_user    = 0x0008
+    _eeprom_offset_factory = 0x1c08
 
     # FPGA regset structure
     _regset_channel_dtype = np.dtype([
@@ -29,7 +30,7 @@ class clb (uio):
         ('lo', _clb_channel_dtype),  #  1.0V range
         ('hi', _clb_channel_dtype)   # 20.0V range
     ])
-    clb_dtype = np.dtype([
+    _clb_dtype = np.dtype([
         ('adc', _clb_range_dtype  , 2),  # oscilloscope
         ('dac', _clb_channel_dtype, 2),  # generator
     ])
@@ -108,7 +109,7 @@ class clb (uio):
         def offset (self, offset: float):
             self.regset.cfg_mul = int(offset * self._DWr)
 
-    def eeprom_read (self):
+    def eeprom_read (self, eeprom_offset = _eeprom_offset_user):
         # open EEPROM device
         try:
             eeprom_file = open(self._eeprom_device, 'rb')
@@ -117,15 +118,17 @@ class clb (uio):
 
         # seek to calibration data
         try:
-            eeprom_file.seek(self._eeprom_offset)
+            eeprom_file.seek(eeprom_offset)
         except IOError as e:
             raise IOError(e.errno, "Seek {}: {}".format(uio, e.strerror))
 
+        # read calibration data into a buffer
         try:
             buffer = eeprom_file.read (self._eeprom_dtype.itemsize)
         except IOError as e:
             raise IOError(e.errno, "Read {}: {}".format(uio, e.strerror))
 
+        # close EEPROM device
         try:
             eeprom_file.close()
         except IOError as e:
@@ -134,11 +137,6 @@ class clb (uio):
         # map buffer onto structure
         eeprom_array = np.recarray(1, self._eeprom_dtype, buf=buffer)
         eeprom_struct = eeprom_array[0]
-
-        # missing magic number means a deprecated EEPROM structure was still not updated
-        if (eeprom_struct.magic != self._MAGIC):
-            for ch in self.channels_adc:
-                eeprom_struct.adc_hi_off[ch] = eeprom_struct.adc_lo_off[ch];
 
         return (eeprom_struct)
 
@@ -151,21 +149,33 @@ class clb (uio):
     def FullScaleFromVoltage(self, voltage: float) -> int:
         return (int(voltage / 100.0 * (1<<32)));
 
-    def eeprom_parse (eeprom_struct):
+    def eeprom_parse (self, eeprom_struct):
 
         # return structure
-        clb_array = np.recarray(1, self._clb_dtype, buf=buffer)
+        clb_array = np.recarray(1, self._clb_dtype)
         clb_struct = clb_array[0]
 
         # convert EEPROM values into local float values
         for ch in self.channels_adc:
-            clb_struct.adc[ch].lo.gain   = self.FullScaleToVoltage (eeprom_struct.adc_lo_gain  [ch]) / 20.0
-            clb_struct.adc[ch].hi.gain   = self.FullScaleToVoltage (eeprom_struct.adc_hi_gain  [ch])
-            clb_struct.adc[ch].lo.offset =                          eeprom_struct.adc_lo_offset[ch]  / (2**13-1)
-            clb_struct.adc[ch].hi.offset =                          eeprom_struct.adc_hi_offset[ch]  / (2**13-1) * 20.0
+            if (eeprom_struct.magic == self._MAGIC):
+                clb_struct.adc[ch].lo.gain = self.FullScaleToVoltage (eeprom_struct.adc_lo_gain  [ch]) / 20.0
+                clb_struct.adc[ch].hi.gain = self.FullScaleToVoltage (eeprom_struct.adc_hi_gain  [ch])
+            else:
+                clb_struct.adc[ch].lo.gain = self.FullScaleToVoltage (eeprom_struct.adc_hi_gain  [ch])
+                clb_struct.adc[ch].hi.gain = self.FullScaleToVoltage (eeprom_struct.adc_lo_gain  [ch]) / 20.0
+            clb_struct.adc[ch].lo.offset   =                          eeprom_struct.adc_lo_offset[ch]  / (2**13-1)
+            if (eeprom_struct.magic == self._MAGIC):
+                clb_struct.adc[ch].hi.offset =                        eeprom_struct.adc_hi_offset[ch]  / (2**13-1) * 20.0
+            else:
+                clb_struct.adc[ch].hi.offset = clb_struct.adc[ch].lo.offset
         for ch in self.channels_dac:
             clb_struct.dac[ch].gain      = self.FullScaleToVoltage (eeprom_struct.dac_gain     [ch])
             clb_struct.dac[ch].offset    =                          eeprom_struct.dac_offset   [ch]  / (2**13-1)
+
+        # missing magic number means a deprecated EEPROM structure was still not updated
+        if (eeprom_struct.magic != self._MAGIC):
+            for ch in self.channels_adc:
+                clb_struct.adc[ch].hi.offset = clb_struct.adc[ch].lo.offset;
 
         return (clb_struct)
 
