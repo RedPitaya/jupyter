@@ -108,15 +108,6 @@ class clb (uio):
         def offset (self, offset: float):
             self.regset.cfg_mul = int(offset * self._DWr)
 
-    def FullScaleToVoltage(self, cnt: int) -> float:
-        if cnt == 0:
-            return (1.0)
-        else:
-            return (cnt * 100.0 / (1<<32))
-
-    def FullScaleFromVoltage(self, voltage: float) -> int:
-        return (int(voltage / 100.0 * (1<<32)));
-
     def eeprom_read (self):
         # open EEPROM device
         try:
@@ -149,24 +140,41 @@ class clb (uio):
             for ch in self.channels_adc:
                 eeprom_struct.adc_hi_off[ch] = eeprom_struct.adc_lo_off[ch];
 
+        return (eeprom_struct)
+
+    def FullScaleToVoltage(self, cnt: int) -> float:
+        if cnt == 0:
+            return (1.0)
+        else:
+            return (cnt * 100.0 / (1<<32))
+
+    def FullScaleFromVoltage(self, voltage: float) -> int:
+        return (int(voltage / 100.0 * (1<<32)));
+
+    def eeprom_parse (eeprom_struct):
+
+        # return structure
+        clb_array = np.recarray(1, self._clb_dtype, buf=buffer)
+        clb_struct = clb_array[0]
+
         # convert EEPROM values into local float values
         for ch in self.channels_adc:
-            self.tmp.adc[ch].lo.gain   = self.FullScaleToVoltage (eeprom_struct.adc_lo_gain[ch]) / 20.0
-            self.tmp.adc[ch].hi.gain   = self.FullScaleToVoltage (eeprom_struct.adc_hi_gain[ch])
-            self.tmp.adc[ch].lo.offset = eeprom_struct.adc_lo_offset[ch] / (2**13-1)
-            self.tmp.adc[ch].hi.offset = eeprom_struct.adc_hi_offset[ch] / (2**13-1) * 20.0
+            clb_struct.adc[ch].lo.gain   = self.FullScaleToVoltage (eeprom_struct.adc_lo_gain  [ch]) / 20.0
+            clb_struct.adc[ch].hi.gain   = self.FullScaleToVoltage (eeprom_struct.adc_hi_gain  [ch])
+            clb_struct.adc[ch].lo.offset =                          eeprom_struct.adc_lo_offset[ch]  / (2**13-1)
+            clb_struct.adc[ch].hi.offset =                          eeprom_struct.adc_hi_offset[ch]  / (2**13-1) * 20.0
         for ch in self.channels_dac:
-            self.tmp.dac[ch].gain   = self.FullScaleToVoltage (eeprom_struct.dac_gain  [ch])
-            self.tmp.dac[ch].offset = eeprom_struct.dac_offset[ch] / (2**13-1)
+            clb_struct.dac[ch].gain      = self.FullScaleToVoltage (eeprom_struct.dac_gain     [ch])
+            clb_struct.dac[ch].offset    =                          eeprom_struct.dac_offset   [ch]  / (2**13-1)
 
-        self.eeprom_struct = eeprom_struct
+        return (clb_struct)
 
-    def show_float (self):
+    def show_float (self, clb_struct):
         for ch in self.channels_adc:
-            print('adc[{}].lo.gain   = {}'.format(ch, self.tmp.adc[ch].lo.gain))
-            print('adc[{}].hi.gain   = {}'.format(ch, self.tmp.adc[ch].hi.gain))
-            print('adc[{}].lo.offset = {}'.format(ch, self.tmp.adc[ch].lo.offset))
-            print('adc[{}].hi.offset = {}'.format(ch, self.tmp.adc[ch].hi.offset))
+            print('adc[{}].lo.gain   = {}'.format(ch, clb_struct.adc[ch].lo.gain))
+            print('adc[{}].hi.gain   = {}'.format(ch, clb_struct.adc[ch].hi.gain))
+            print('adc[{}].lo.offset = {}'.format(ch, clb_struct.adc[ch].lo.offset))
+            print('adc[{}].hi.offset = {}'.format(ch, clb_struct.adc[ch].hi.offset))
         for ch in self.channels_dac:
-            print('dac[{}].gain   = {}'.format(ch, self.tmp.dac[ch].gain))
-            print('dac[{}].offset = {}'.format(ch, self.tmp.dac[ch].offset))
+            print('dac[{}].gain      = {}'.format(ch, clb_struct.dac[ch].gain))
+            print('dac[{}].offset    = {}'.format(ch, clb_struct.dac[ch].offset))
