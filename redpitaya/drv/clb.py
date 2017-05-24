@@ -6,13 +6,6 @@ class clb (uio):
     channels_adc = range(2)
     channels_dac = range(2)
 
-    DWA = 16
-    DWG = 14
-    _DWAr = 2**DWA - 1
-    _DWGr = 2**DWG - 1
-    _DWA1 = 2**(DWA-2)
-    _DWG1 = 2**(DWG-2)
-    
     _MAGIC = 0xAABBCCDD
     _eeprom_device = "/sys/bus/i2c/devices/0-0050/eeprom"
     _eeprom_offset = 0x0008
@@ -56,19 +49,21 @@ class clb (uio):
         super().__init__(uio)
         regset_array = np.recarray(1, self._regset_dtype, buf=self.uio_mmaps[0])
         self.regset = regset_array[0]
-        
-        self.adc = [self.ADC(self.regset.adc[ch], self._DWA1, self._DWAr) for ch in self.channels_adc]
-        self.dac = [self.DAC(self.regset.dac[ch], self._DWG1, self._DWGr) for ch in self.channels_dac]
+
+        self.adc = [self.ADC(self.regset.adc[ch]) for ch in self.channels_adc]
+        self.dac = [self.DAC(self.regset.dac[ch]) for ch in self.channels_dac]
 
     def __del__ (self):
         super().__del__()
 
     class ADC (object):
-        def __init__ (self, regset, DW1, DWr):
+        DW = 16
+        _DWr = 2**DW - 1
+        _DW1 = 2**(DW-2)
+
+        def __init__ (self, regset):
             self.regset = regset
-            self._DW1 = DW1
-            self._DWr = DWr
-        
+
         @property
         def gain (self) -> float:
             """ADC gain calibration."""
@@ -88,11 +83,13 @@ class clb (uio):
             self.regset.cfg_mul = int(offset * self._DWr)
 
     class DAC (object):
-        def __init__ (self, regset, DW1, DWr):
+        DW = 14
+        _DWr = 2**DW - 1
+        _DW1 = 2**(DW-2)
+
+        def __init__ (self, regset):
             self.regset = regset
-            self._DW1 = DW1
-            self._DWr = DWr
-        
+
         @property
         def gain (self) -> float:
             """DAC gain calibration."""
@@ -146,7 +143,7 @@ class clb (uio):
         # map buffer onto structure
         eeprom_array = np.recarray(1, self._eeprom_dtype, buf=buffer)
         eeprom_struct = eeprom_array[0]
-    
+
         # missing magic number means a deprecated EEPROM structure was still not updated
         if (eeprom_struct.magic != self._MAGIC):
             for ch in self.channels_adc:
