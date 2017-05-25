@@ -1,4 +1,6 @@
+from ctypes import *
 import numpy as np
+import math
 
 import mmap
 
@@ -25,33 +27,32 @@ class osc (uio, evn):
     _filters = { 1.0: (0x7D93, 0x437C7, 0xd9999a, 0x2666),
                 20.0: (0x4C5F, 0x2F38B, 0xd9999a, 0x2666)}
 
-    _regset_dtype = np.dtype([
-        # control/status
-        ('ctl_sts', 'uint32'),
-        ('cfg_evn', 'uint32'),  # software event source select
-        ('cfg_trg', 'uint32'),  # hardware trigger mask
-        ('rsv_000', 'uint32', 1),
-        # pre/post trigger counters
-        ('cfg_pre', 'uint32'),  # configuration pre  trigger
-        ('cfg_pst', 'uint32'),  # configuration post trigger
-        ('sts_pre', 'uint32'),  # status pre  trigger
-        ('sts_pst', 'uint32'),  # status post trigger
-        # edge detection
-        ('cfg_neg',  'int32'),  # negative level
-        ('cfg_pos',  'int32'),  # positive level
-        ('cfg_edg', 'uint32'),  # edge (0-pos, 1-neg)
-        ('cfg_hld', 'uint32'),  # hold off time
-        # decimation
-        ('cfg_dec', 'uint32'),  # decimation factor
-        ('cfg_shr', 'uint32'),  # shift right
-        ('cfg_avg', 'uint32'),  # average enable
-        # filter
-        ('cfg_byp', 'uint32'),  # bypass
-        ('cfg_faa',  'int32'),  # AA coeficient
-        ('cfg_fbb',  'int32'),  # BB coeficient
-        ('cfg_fkk',  'int32'),  # KK coeficient
-        ('cfg_fpp',  'int32')   # PP coeficient
-    ])
+    class _regset_t (Structure):
+        _fields_ = [# control/status
+                    ('ctl_sts', c_uint32    ),
+                    ('cfg_evn', c_uint32    ),  # software event source select
+                    ('cfg_trg', c_uint32    ),  # hardware trigger mask
+                    ('rsv_000', c_uint32 * 1),
+                    # pre/post trigger counters
+                    ('cfg_pre', c_uint32    ),  # configuration pre  trigger
+                    ('cfg_pst', c_uint32    ),  # configuration post trigger
+                    ('sts_pre', c_uint32    ),  # status pre  trigger
+                    ('sts_pst', c_uint32    ),  # status post trigger
+                    # edge detection
+                    ('cfg_neg',  c_int32    ),  # negative level
+                    ('cfg_pos',  c_int32    ),  # positive level
+                    ('cfg_edg', c_uint32    ),  # edge (0-pos, 1-neg)
+                    ('cfg_hld', c_uint32    ),  # hold off time
+                    # decimation
+                    ('cfg_dec', c_uint32    ),  # decimation factor
+                    ('cfg_shr', c_uint32    ),  # shift right
+                    ('cfg_avg', c_uint32    ),  # average enable
+                    # filter
+                    ('cfg_byp', c_uint32    ),  # bypass
+                    ('cfg_faa',  c_int32    ),  # AA coeficient
+                    ('cfg_fbb',  c_int32    ),  # BB coeficient
+                    ('cfg_fkk',  c_int32    ),  # KK coeficient
+                    ('cfg_fpp',  c_int32    )]  # PP coeficient
 
     def __init__ (self, index:int, input_range:float, uio:str = '/dev/uio/osc'):
         """Module instance index should be provided"""
@@ -63,8 +64,7 @@ class osc (uio, evn):
         super().__init__(uio)
 
         # map regset
-        regset_array = np.recarray(1, self._regset_dtype, buf=self.uio_mmaps[0])
-        self.regset = regset_array[0]
+        self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
         # map buffer table
         self.table = np.frombuffer(self.uio_mmaps[1], 'int16')
 
@@ -79,7 +79,7 @@ class osc (uio, evn):
         """Print FPGA module register set for debugging purposes."""
         print (
             "ctl_sts = 0x{reg:08x} = {reg:10d}  # control/status            \n".format(reg=self.regset.ctl_sts)+
-            "cfg_evn = 0x{reg:08x} = {reg:10d}  # SW event source select    \n".format(reg=self.regset.cfg_rst)+
+            "cfg_evn = 0x{reg:08x} = {reg:10d}  # SW event source select    \n".format(reg=self.regset.cfg_evn)+
             "cfg_trg = 0x{reg:08x} = {reg:10d}  # HW trigger mask           \n".format(reg=self.regset.cfg_trg)+
             "cfg_pre = 0x{reg:08x} = {reg:10d}  # delay pre  trigger        \n".format(reg=self.regset.cfg_pre)+
             "cfg_pst = 0x{reg:08x} = {reg:10d}  # delay post trigger        \n".format(reg=self.regset.cfg_pst)+
@@ -172,11 +172,11 @@ class osc (uio, evn):
         if isinstance(value, float):
             value = [value]*2
         if (-1.0 <= value[0] <= 1.0):
-            self.regset.cfg_neg = value[0] * scale
+            self.regset.cfg_neg = int(value[0] * scale)
         else:
             raise ValueError("Trigger negative level should be inside [{},{}]".format(self.__input_range))
         if (-1.0 <= value[1] <= 1.0):
-            self.regset.cfg_pos = value[1] * scale
+            self.regset.cfg_pos = int(value[1] * scale)
         else:
             raise ValueError("Trigger positive level should be inside [{},{}]".format(self.__input_range))
 

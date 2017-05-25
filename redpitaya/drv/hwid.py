@@ -1,23 +1,21 @@
-import numpy as np
+from ctypes import *
 
 from .uio import uio
 
 class hwid (uio):
     """Driver for hardware identification module"""
-    _regset_dtype = np.dtype([
-        ('hwid' , 'uint32'),
-        ('rsv0' , 'uint32'),  # reserved
-        ('efuse', 'uint32'),
-        ('rsv1' , 'uint32'),  # reserved
-        ('dna'  , 'uint32', 2),
-        ('rsv3' , 'uint32', 2),  # reserved
-        ('gith' , 'uint32', 5)
-    ])
+    class _regset_t (Structure):
+         _fields_ = [('hwid' , c_uint32    ),
+                     ('rsv0' , c_uint32    ),  # reserved
+                     ('efuse', c_uint32    ),
+                     ('rsv1' , c_uint32    ),  # reserved
+                     ('dna'  , c_uint32 * 2),
+                     ('rsv3' , c_uint32 * 2),  # reserved
+                     ('gith' , c_uint32 * 5)]
 
     def __init__ (self, uio:str = '/dev/uio/hwid'):
         super().__init__(uio)
-        regset_array = np.recarray(1, self._regset_dtype, buf=self.uio_mmaps[0])
-        self.regset = regset_array[0]
+        self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
 
     def __del__ (self):
         super().__del__()

@@ -1,5 +1,4 @@
-import ctypes
-import math
+from ctypes import *
 import numpy as np
 
 from enum import Enum
@@ -46,32 +45,31 @@ class gen (uio, evn, wave):
     _f_max = FS / 2
     _f_one = FS / 2**CWM
 
-    _regset_dtype = np.dtype([
-        # control/status
-        ('ctl_sts', 'uint32'),
-        ('cfg_evn', 'uint32'),  # software event source select
-        ('cfg_trg', 'uint32'),  # hardware trigger mask
-        ('rsv_000', 'uint32', 1),
-        # generator mode
-        ('cfg_bmd', 'uint32'),  # mode [1:0] = [inf, ben]
-        # continuous/periodic configuration
-        ('cfg_siz', 'uint32'),  # size
-        ('cfg_off', 'uint32'),  # offset
-        ('cfg_ste', 'uint32'),  # step
-        # burst configuration
-        ('cfg_bdr', 'uint32'),  # burst data   repetitions
-        ('cfg_bdl', 'uint32'),  # burst data   length
-        ('cfg_bpl', 'uint32'),  # burst period length (data+pause)
-        ('cfg_bpn', 'uint32'),  # burst period number
-        # burst status
-        ('sts_bln', 'uint32'),  # length (current position inside burst length)
-        ('sts_bnm', 'uint32'),  # number (current burst counter)
-        ('rsv_001', 'uint32', 2),
-        # linear transformation
-        ('cfg_mul',  'int32'),  # multiplier (amplitude)
-        ('cfg_sum',  'int32'),  # adder (offset)
-        ('cfg_ena', 'uint32')   # output enable
-    ])
+    class _regset_t (Structure):
+        _fields_ = [# control/status
+                    ('ctl_sts', c_uint32    ),
+                    ('cfg_evn', c_uint32    ),  # software event source select
+                    ('cfg_trg', c_uint32    ),  # hardware trigger mask
+                    ('rsv_000', c_uint32 * 1),
+                    # generator mode
+                    ('cfg_bmd', c_uint32    ),  # mode [1:0] = [inf, ben]
+                    # continuous/periodic configuration
+                    ('cfg_siz', c_uint32    ),  # size
+                    ('cfg_off', c_uint32    ),  # offset
+                    ('cfg_ste', c_uint32    ),  # step
+                    # burst configuration
+                    ('cfg_bdr', c_uint32    ),  # burst data   repetitions
+                    ('cfg_bdl', c_uint32    ),  # burst data   length
+                    ('cfg_bpl', c_uint32    ),  # burst period length (data+pause)
+                    ('cfg_bpn', c_uint32    ),  # burst period number
+                    # burst status
+                    ('sts_bln', c_uint32    ),  # length (current position inside burst length)
+                    ('sts_bnm', c_uint32    ),  # number (current burst counter)
+                    ('rsv_001', c_uint32 * 2),
+                    # linear transformation
+                    ('cfg_mul',  c_int32    ),  # multiplier (amplitude)
+                    ('cfg_sum',  c_int32    ),  # adder (offset)
+                    ('cfg_ena', c_uint32    )]  # output enable
 
     def __init__ (self, index: int, uio: str = '/dev/uio/gen'):
         """Module instance index should be provided"""
@@ -83,8 +81,7 @@ class gen (uio, evn, wave):
         super().__init__(uio)
 
         # map regset
-        regset_array = np.recarray(1, self._regset_dtype, buf=self.uio_mmaps[0])
-        self.regset = regset_array[0]
+        self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
         # map buffer table
         self.table = np.frombuffer(self.uio_mmaps[1], 'int32')
 
@@ -100,7 +97,7 @@ class gen (uio, evn, wave):
         """Print FPGA module register set for debugging purposes."""
         print (
             "ctl_sts = 0x{reg:08x} = {reg:10d}  # control/status                 \n".format(reg=self.regset.ctl_sts)+
-            "cfg_evn = 0x{reg:08x} = {reg:10d}  # software event source select   \n".format(reg=self.regset.cfg_rst)+
+            "cfg_evn = 0x{reg:08x} = {reg:10d}  # software event source select   \n".format(reg=self.regset.cfg_evn)+
             "cfg_trg = 0x{reg:08x} = {reg:10d}  # hardware trigger mask          \n".format(reg=self.regset.cfg_trg)+
             "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg=self.regset.cfg_bmd)+
             "cfg_siz = 0x{reg:08x} = {reg:10d}  # table size                     \n".format(reg=self.regset.cfg_siz)+
@@ -125,7 +122,7 @@ class gen (uio, evn, wave):
     @amplitude.setter
     def amplitude (self, value: float):
         if (-1.0 <= value <= 1.0):
-            self.regset.cfg_mul = value * self._DWMr
+            self.regset.cfg_mul = int(value * self._DWMr)
         else:
             raise ValueError("Output amplitude should be inside [-1,1] volts.")
 
@@ -137,7 +134,7 @@ class gen (uio, evn, wave):
     @offset.setter
     def offset (self, value: float):
         if (-1.0 <= value <= 1.0):
-            self.regset.cfg_sum = value * self._DWSr
+            self.regset.cfg_sum = int(value * self._DWSr)
         else:
             raise ValueError("Output offset should be inside [-1,1] volts.")
 

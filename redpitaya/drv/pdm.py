@@ -1,4 +1,4 @@
-import numpy as np
+from ctypes import *
 
 from .uio import uio
 
@@ -8,14 +8,13 @@ class pdm (uio):
     DW = 8
     _DWr = 2**DW - 1
 
-    _regset_dtype = np.dtype([
-        ('pdm' , 'uint32', DN)
-    ])
+    class _regset_t (Structure):
+        DN = 4 # TODO: the DN value from the 'pdm' class should be used
+        _fields_ = [('pdm', c_uint32 * DN)]
 
     def __init__ (self, uio:str = '/dev/uio/pdm'):
         super().__init__(uio)
-        regset_array = np.recarray(1, self._regset_dtype, buf=self.uio_mmaps[0])
-        self.regset = regset_array[0]
+        self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
 
     def __del__ (self):
         super().__del__()
