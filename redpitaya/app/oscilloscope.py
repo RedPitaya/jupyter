@@ -63,8 +63,8 @@ class oscilloscope (object):
         # set parameters common to all channels
         for ch in channels:
             # trigger timing is in the middle of the screen
-            self.osc[ch].trigger_pre  = self.size/2
-            self.osc[ch].trigger_post = self.size/2
+            self.osc[ch].trigger_pre  = self.size//2
+            self.osc[ch].trigger_post = self.size//2
 
         # default trigger source
         self.t_source = 0
