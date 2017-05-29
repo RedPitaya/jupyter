@@ -9,7 +9,7 @@ from .uio import uio
 from .evn import evn
 from .wave import wave
 
-class gen (uio, evn, wave):
+class gen (evn, uio, wave):
     """
     Generator FPGA module driver.
     """
@@ -46,11 +46,8 @@ class gen (uio, evn, wave):
     _f_one = FS / 2**CWM
 
     class _regset_t (Structure):
-        _fields_ = [# control/status
-                    ('ctl_sts', c_uint32    ),
-                    ('cfg_evn', c_uint32    ),  # software event source select
-                    ('cfg_trg', c_uint32    ),  # hardware trigger mask
-                    ('rsv_000', c_uint32 * 1),
+        _fields_ = [('evn', evn._regset_t),
+                    ('rsv_000', c_uint32),
                     # generator mode
                     ('cfg_bmd', c_uint32    ),  # mode [1:0] = [inf, ben]
                     # continuous/periodic configuration
@@ -95,10 +92,8 @@ class gen (uio, evn, wave):
 
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
+        evn.show_regset(self)
         print (
-            "ctl_sts = 0x{reg:08x} = {reg:10d}  # control/status                 \n".format(reg=self.regset.ctl_sts)+
-            "cfg_evn = 0x{reg:08x} = {reg:10d}  # software event source select   \n".format(reg=self.regset.cfg_evn)+
-            "cfg_trg = 0x{reg:08x} = {reg:10d}  # hardware trigger mask          \n".format(reg=self.regset.cfg_trg)+
             "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg=self.regset.cfg_bmd)+
             "cfg_siz = 0x{reg:08x} = {reg:10d}  # table size                     \n".format(reg=self.regset.cfg_siz)+
             "cfg_off = 0x{reg:08x} = {reg:10d}  # table offset                   \n".format(reg=self.regset.cfg_off)+
