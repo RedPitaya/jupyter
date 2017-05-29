@@ -2,35 +2,6 @@ from ctypes import *
 
 from .uio import uio
 
-# FPGA regset structure
-class _regset_channel_t (Structure):
-    _fields_ = [('cfg_mul', c_int32),  # multiplication
-                ('cfg_sum', c_int32)]  # summation
-class _regset_t (Structure):
-    _fields_ = [('dac', _regset_channel_t * 2),  # generator
-                ('adc', _regset_channel_t * 2)]  # oscilloscope
-
-# floating point structure
-class _clb_channel_t (Structure):
-    _fields_ = [('gain'  , c_float),  # multiplication
-                ('offset', c_float)]  # summation
-class _clb_range_t (Structure):
-    _fields_ = [('lo', _clb_channel_t),  #  1.0V range
-                ('hi', _clb_channel_t)]  # 20.0V range
-class _clb_t (Structure):
-    _fields_ = [('dac', _clb_channel_t * 2),  # generator
-                ('adc', _clb_range_t   * 2)]  # oscilloscope
-
-# EEPROM structure
-class _eeprom_t (Structure):
-    _fields_ = [('adc_hi_gain'  , c_uint32 * 2),
-                ('adc_lo_gain'  , c_uint32 * 2),
-                ('adc_lo_offset',  c_int32 * 2),
-                ('dac_gain'     , c_uint32 * 2),
-                ('dac_offset'   ,  c_int32 * 2),
-                ('magic'        , c_uint32    ),
-                ('adc_hi_offset',  c_int32 * 2)]
-
 class clb (uio):
     channels_dac = range(2)
     channels_adc = range(2)
@@ -40,9 +11,38 @@ class clb (uio):
     _eeprom_offset_user    = 0x0008
     _eeprom_offset_factory = 0x1c08
 
+    # FPGA regset structure
+    class _regset_t (Structure):
+        class _regset_channel_t (Structure):
+            _fields_ = [('cfg_mul', c_int32),  # multiplication
+                        ('cfg_sum', c_int32)]  # summation
+        _fields_ = [('dac', _regset_channel_t * 2),  # generator
+                    ('adc', _regset_channel_t * 2)]  # oscilloscope
+
+    # floating point structure
+    class _clb_t (Structure):
+        class _clb_range_t (Structure):
+            class _clb_channel_t (Structure):
+                _fields_ = [('gain'  , c_float),  # multiplication
+                            ('offset', c_float)]  # summation
+            _fields_ = [('lo', _clb_channel_t),  #  1.0V range
+                        ('hi', _clb_channel_t)]  # 20.0V range
+        _fields_ = [('dac', _clb_range_t._clb_channel_t * 2),  # generator
+                    ('adc', _clb_range_t                * 2)]  # oscilloscope
+
+    # EEPROM structure
+    class _eeprom_t (Structure):
+        _fields_ = [('adc_hi_gain'  , c_uint32 * 2),
+                    ('adc_lo_gain'  , c_uint32 * 2),
+                    ('adc_lo_offset',  c_int32 * 2),
+                    ('dac_gain'     , c_uint32 * 2),
+                    ('dac_offset'   ,  c_int32 * 2),
+                    ('magic'        , c_uint32    ),
+                    ('adc_hi_offset',  c_int32 * 2)]
+
     def __init__ (self, uio:str = '/dev/uio/clb'):
         super().__init__(uio)
-        self.regset = _regset_t.from_buffer(self.uio_mmaps[0])
+        self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
 
         self.dac = [self.DAC(self.regset.dac[ch]) for ch in self.channels_dac]
         self.adc = [self.ADC(self.regset.adc[ch]) for ch in self.channels_adc]
@@ -117,7 +117,7 @@ class clb (uio):
 
         # read calibration data into a buffer
         try:
-            buffer = eeprom_file.read (sizeof(_eeprom_t))
+            buffer = eeprom_file.read (sizeof(self._eeprom_t))
         except IOError as e:
             raise IOError(e.errno, "Read {}: {}".format(uio, e.strerror))
 
@@ -128,7 +128,7 @@ class clb (uio):
             raise IOError(e.errno, "Close {}: {}".format(uio, e.strerror))
 
         # map buffer onto structure
-        eeprom_struct = _eeprom_t.from_buffer_copy(buffer)
+        eeprom_struct = self._eeprom_t.from_buffer_copy(buffer)
         return (eeprom_struct)
 
     def FullScaleToVoltage(self, cnt: int) -> float:
@@ -143,7 +143,7 @@ class clb (uio):
     def eeprom_parse (self, eeprom_struct):
 
         # return structure
-        clb_struct = _clb_t()
+        clb_struct = self._clb_t()
 
         # convert EEPROM values into local float values
         for ch in self.channels_adc:
