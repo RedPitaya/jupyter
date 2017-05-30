@@ -95,7 +95,7 @@ class gen (evn, asg_per, asg_bst, gen_out, wave, uio):
 
         Array can be up to `buffer_size` samples in length.
         """
-        siz = (self.regset.cfg_siz + 1) >> self.CWF
+        siz = self.table_size
         # TODO: nparray
         return [self.table[i] / self._DWr for i in range(siz)]
 
@@ -106,7 +106,7 @@ class gen (evn, asg_per, asg_bst, gen_out, wave, uio):
             for i in range(siz):
                 # TODO add saturation
                 self.table[i] = int(value[i] * self._DWr)
-            self.regset.cfg_siz = (siz << self.CWF) - 1
+            self.table_size = siz
         else:
             raise ValueError("Waveform table size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
 

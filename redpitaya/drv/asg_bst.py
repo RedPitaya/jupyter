@@ -25,7 +25,6 @@ class asg_bst (object):
 
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
-        evn.show_regset(self)
         print (
             "cfg_bdr = 0x{reg:08x} = {reg:10d}  # burst data   repetition        \n".format(reg=self.regset.bst.cfg_bdr)+
             "cfg_bdl = 0x{reg:08x} = {reg:10d}  # burst data   length            \n".format(reg=self.regset.bst.cfg_bdl)+

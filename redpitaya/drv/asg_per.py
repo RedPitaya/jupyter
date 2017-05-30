@@ -35,7 +35,7 @@ class asg_per (object):
     @table_size.setter
     def table_size (self, value: int):
         if (value <= self.buffer_size):
-            self.regset.per.cfg_siz = (siz << self.CWF) - 1
+            self.regset.per.cfg_siz = (value << self.CWF) - 1
         else:
             raise ValueError("Waveform table size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
 
