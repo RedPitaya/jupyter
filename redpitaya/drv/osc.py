@@ -22,13 +22,8 @@ class osc (evn, acq, osc_trg, osc_fil, uio):
     CW = 31 #: counter size
     _CWr = 2**CW
 
-    # trigger edge dictionary
-    _edges = {'pos': 0, 'neg': 1}
     #: analog stage range voltages
     ranges = (1.0, 20.0)
-    # filter coeficients
-    _filters = { 1.0: (0x7D93, 0x437C7, 0xd9999a, 0x2666),
-                20.0: (0x4C5F, 0x2F38B, 0xd9999a, 0x2666)}
 
     class _regset_t (Structure):
         _fields_ = [('evn', evn._regset_t),

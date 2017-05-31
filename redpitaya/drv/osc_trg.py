@@ -5,8 +5,7 @@ class osc_trg (object):
     _edges = {'pos': 0, 'neg': 1}
 
     class _regset_t (Structure):
-        _fields_ = [# edge detection
-                    ('cfg_neg',  c_int32),  # negative level
+        _fields_ = [('cfg_neg',  c_int32),  # negative level
                     ('cfg_pos',  c_int32),  # positive level
                     ('cfg_edg', c_uint32),  # edge (0-pos, 1-neg)
                     ('cfg_hld', c_uint32)]  # hold off time
