@@ -10,7 +10,7 @@ from .la_trg  import la_trg
 from .la_msk  import la_msk
 from .uio     import uio
 
-class osc (evn, acq, la_trg, la_msk, uio):
+class la (evn, acq, la_trg, la_msk, uio):
     #: sampling frequency
     FS = 125000000.0
     #: register width - linear addition multiplication
@@ -21,12 +21,6 @@ class osc (evn, acq, la_trg, la_msk, uio):
     buffer_size = 2**14 #: buffer size
     CW = 31 #: counter size
     _CWr = 2**CW
-
-    # trigger edge dictionary
-    _edges = {'pos': 0, 'neg': 1}
-    # filter coeficients
-    _filters = { 1.0: (0x7D93, 0x437C7, 0xd9999a, 0x2666),
-                20.0: (0x4C5F, 0x2F38B, 0xd9999a, 0x2666)}
 
     class _regset_t (Structure):
         _fields_ = [('evn', evn._regset_t),
@@ -39,12 +33,7 @@ class osc (evn, acq, la_trg, la_msk, uio):
                     # mask/polarity
                     ('msk', la_msk._regset_t)]
 
-    def __init__ (self, index:int, input_range:float, uio:str = '/dev/uio/osc'):
-        """Module instance index should be provided"""
-
-        # use index
-        uio = uio+str(index)
-
+    def __init__ (self, uio:str = '/dev/uio/la'):
         # call parent class init to open UIO device and map regset
         super().__init__(uio)
 
@@ -52,10 +41,6 @@ class osc (evn, acq, la_trg, la_msk, uio):
         self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
         # map buffer table
         self.table = np.frombuffer(self.uio_mmaps[1], 'int16')
-
-        # set input range (there is no default)
-        self.input_range = input_range
-
     def __del__ (self):
         # call parent class init to unmap maps and close UIO device
         super().__del__()
@@ -111,8 +96,7 @@ class osc (evn, acq, la_trg, la_msk, uio):
         Returns
         -------
         array
-            Array containing float samples scaled
-            to the selected analog range.
+            Array containing binary samples.
             The data is alligned at the end to the last sample
             stored into the buffer.
         """
@@ -121,4 +105,4 @@ class osc (evn, acq, la_trg, la_msk, uio):
         adr = (self.buffer_size + ptr - siz) % self.buffer_size
         # TODO: avoid making copy of entire array
         table = np.roll(self.table, -ptr)
-        return table.astype('float32')[-siz:] * (self.__input_range / self._DWr)
+        return table.astype('uint16')[-siz:]

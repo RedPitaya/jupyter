@@ -1,6 +1,6 @@
 from ctypes import *
 
-class osc_trg (object):
+class la_trg (object):
     class _regset_t (Structure):
         _fields_ = [('cfg_cmp_msk', c_uint32),  # comparator mask
                     ('cfg_cmp_val', c_uint32),  # comparator value

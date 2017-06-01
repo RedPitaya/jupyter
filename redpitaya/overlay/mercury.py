@@ -8,6 +8,8 @@ from redpitaya.drv.pdm     import pdm
 from redpitaya.drv.clb     import clb
 from redpitaya.drv.gen     import gen
 from redpitaya.drv.osc     import osc
+from redpitaya.drv.lg      import lg
+from redpitaya.drv.la      import la
 
 import iio
 
@@ -120,3 +122,9 @@ class mercury (overlay):
                 self.trig_src = mercury.trig_src['osc'+str(index)]
             else:
                 raise ValueError("Oscilloscope index should be one of {}".format(range(mercury._MNO)))
+
+    class lg (lg):
+        pass
+
+    class la (la):
+        pass
