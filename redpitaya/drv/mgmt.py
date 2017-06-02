@@ -22,8 +22,8 @@ class mgmt (uio):
         0 - pin is connected to PS GPIO controller
         1 - pin is connected to Logic generator.
         """
-        return (self.regset.msk.cfg_iom)
+        return (self.regset.cfg_iom)
 
     @gpio_mode.setter
     def gpio_mode (self, value: int):
-        self.regset.msk.cfg_iom = value
+        self.regset.cfg_iom = value

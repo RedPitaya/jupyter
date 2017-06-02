@@ -4,6 +4,7 @@ from periphery             import LED
 from periphery             import GPIO
 
 from redpitaya.drv.hwid    import hwid
+from redpitaya.drv.mgmt    import mgmt
 from redpitaya.drv.pdm     import pdm
 from redpitaya.drv.clb     import clb
 from redpitaya.drv.gen     import gen
@@ -88,6 +89,9 @@ class mercury (overlay):
             return (int(raw)*float(self.scale)/1000 / self.resdiv)
 
     class hwid (hwid):
+        pass
+
+    class mgmt (mgmt):
         pass
 
     class analog_out (pdm):
