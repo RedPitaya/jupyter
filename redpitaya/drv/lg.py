@@ -77,7 +77,7 @@ class lg (evn, asg_bst, lg_out, uio):
         """
         siz = self.table_size
         # TODO: nparray
-        return [self.table[i] / self._DWr for i in range(siz)]
+        return [self.table[i] for i in range(siz)]
 
     @waveform.setter
     def waveform (self, value):
@@ -85,7 +85,7 @@ class lg (evn, asg_bst, lg_out, uio):
         if (siz <= self.buffer_size):
             for i in range(siz):
                 # TODO add saturation
-                self.table[i] = int(value[i] * self._DWr)
+                self.table[i] = value[i]
             self.table_size = siz
         else:
             raise ValueError("Waveform table size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
