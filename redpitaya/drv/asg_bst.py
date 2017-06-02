@@ -41,7 +41,7 @@ class asg_bst (object):
 
     @burst_data_repetitions.setter
     def burst_data_repetitions (self, value: int):
-        if (value < self._CWRr):
+        if (value <= self._CWRr):
             self.regset.bst.cfg_bdr = value - 1
         else:
             raise ValueError("Burst data repetitions should be less or equal to {}.".format(self._CWRr))
@@ -53,7 +53,7 @@ class asg_bst (object):
 
     @burst_data_length.setter
     def burst_data_length (self, value: int):
-        if (value < self._CWMr):
+        if (value <= self._CWMr):
             self.regset.bst.cfg_bdl = value - 1
         else:
             raise ValueError("Burst data length should be less or equal to {}.".format(self._CWMr))
@@ -65,7 +65,7 @@ class asg_bst (object):
 
     @burst_period_length.setter
     def burst_period_length (self, value: int):
-        if (value < self._CWLr):
+        if (value <= self._CWLr):
             self.regset.bst.cfg_bpl = value - 1
         else:
             raise ValueError("Burst period length should be less or equal to {}.".format(self._CWLr))
@@ -77,7 +77,7 @@ class asg_bst (object):
 
     @burst_period_number.setter
     def burst_period_number (self, value: int):
-        if (value < self._CWNr):
+        if (value <= self._CWNr):
             self.regset.bst.cfg_bpn = value - 1
         else:
             raise ValueError("Burst period number should be less or equal to {}.".format(self._CWNr))
