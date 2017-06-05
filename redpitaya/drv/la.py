@@ -7,10 +7,11 @@ import mmap
 from .evn     import evn
 from .acq     import acq
 from .la_trg  import la_trg
+from .la_rle  import la_rle
 from .la_msk  import la_msk
 from .uio     import uio
 
-class la (evn, acq, la_trg, la_msk, uio):
+class la (evn, acq, la_trg, la_rle, la_msk, uio):
     #: sampling frequency
     FS = 125000000.0
     #: register width - linear addition multiplication
@@ -25,13 +26,11 @@ class la (evn, acq, la_trg, la_msk, uio):
     class _regset_t (Structure):
         _fields_ = [('evn', evn._regset_t),
                     ('rsv_000', c_uint32),
-                    ('acq', acq._regset_t),  # pre/post trigger counters
-                    # edge detection
-                    ('trg', la_trg._regset_t),
-                    # decimation
-                    ('cfg_dec', c_uint32),  # decimation factor
-                    # mask/polarity
-                    ('msk', la_msk._regset_t)]
+                    ('acq', acq._regset_t),     # pre/post trigger counters
+                    ('trg', la_trg._regset_t),  # trigger (value, edge) detection
+                    ('cfg_dec', c_uint32),      # decimation factor
+                    ('rle', la_rle._regset_t),  # RLE
+                    ('msk', la_msk._regset_t)]  # mask/polarity
 
     def __init__ (self, uio:str = '/dev/uio/la'):
         # call parent class init to open UIO device and map regset
@@ -53,6 +52,7 @@ class la (evn, acq, la_trg, la_msk, uio):
         print (
             "cfg_dec = 0x{reg:08x} = {reg:10d}  # decimation factor         \n".format(reg=self.regset.cfg_dec)
         )
+        la_rle.show_regset(self)
         la_msk.show_regset(self)
 
     @property
