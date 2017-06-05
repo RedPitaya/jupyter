@@ -128,7 +128,11 @@ class mercury (overlay):
                 raise ValueError("Oscilloscope index should be one of {}".format(range(mercury._MNO)))
 
     class lg (lg):
-        pass
+        def __init__ (self):
+            super().__init__ ()
+            self.sync_src = mercury.sync_src['lg']
 
     class la (la):
-        pass
+        def __init__ (self):
+            super().__init__ ()
+            self.sync_src = mercury.sync_src['la']
