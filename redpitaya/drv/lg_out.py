@@ -24,10 +24,10 @@ class lg_out (object):
     +--------------+--------------+-------------+----------------+-------------+-------------------------------+
     """
     class _regset_t (Structure):
-        _fields_ = [('cfg_oen', c_uint32),  # output enable
-                    ('cfg_msk', c_uint32),  # bit mask
-                    ('cfg_val', c_uint32),  # bit value
-                    ('cfg_pol', c_uint32)]  # polarity inversion
+        _fields_ = [('cfg_oe0', c_uint32),  # output enable 0
+                    ('cfg_oe1', c_uint32),  # output enable 1
+                    ('cfg_msk', c_uint32),  # mask
+                    ('cfg_val', c_uint32)]  # value/polarity
 
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
@@ -45,6 +45,8 @@ class lg_out (object):
 
     @enable.setter
     def enable (self, value: tuple):
+        if isinstance(value, int):
+            value = [value]*2
         [self.regset.out.cfg_oe0, self.regset.out.cfg_oe1] = value
 
     @property
@@ -54,7 +56,7 @@ class lg_out (object):
 
     @mask.setter
     def mask (self, value: int):
-        self.regset.out.cfg_sum = value
+        self.regset.out.cfg_msk = value
 
     @property
     def value (self) -> int:
