@@ -14,6 +14,12 @@ class mgmt (uio):
     def __del__ (self):
         super().__del__()
 
+    def show_regset (self):
+        """Print FPGA module register set for debugging purposes."""
+        print (
+            "cfg_iom = 0x{reg:08x} = {reg:10d}  # GPIO mode\n".format(reg=self.regset.cfg_iom)
+        )
+
     @property
     def gpio_mode (self) -> int:
         """GPIO mode
