@@ -39,8 +39,9 @@ class lg (evn, asg_bst, lg_out, uio):
         _fields_ = [('evn', evn._regset_t),
                     ('rsv_000', c_uint32),
                     ('cfg_bmd', c_uint32),  # mode [1:0] = [inf, ben]
+                    ('rsv_001', c_uint32 * 3),
                     ('bst', asg_bst._regset_t),
-                    ('rsv_001', c_uint32 * 2),
+                    ('rsv_002', c_uint32 * 2),
                     ('out', lg_out._regset_t)]
 
     def __init__ (self, uio: str = '/dev/uio/lg'):
