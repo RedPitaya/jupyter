@@ -3,18 +3,13 @@ import fcntl
 import mmap
 import pyudev
 
-def ashex (self, attribute):
-    return int(self.asstring(attribute), 16)
-
-pyudev.Attributes.ashex = ashex
-
 class _uio_map (object):
-    def __init__(self, device, path: str):
-        self.index  = int(path[3:])
-        self.name   = device.attributes.asstring(os.path.join('maps', path, 'name'))
-        self.addr   = device.attributes.ashex   (os.path.join('maps', path, 'addr'))
-        self.offset = device.attributes.ashex   (os.path.join('maps', path, 'offset'))
-        self.size   = device.attributes.ashex   (os.path.join('maps', path, 'size'))
+    def __init__(self, device, index: int):
+        self.index  = index
+        self.name   =     device.attributes.asstring('maps/map'+str(index)+'/name')
+        self.addr   = int(device.attributes.asstring('maps/map'+str(index)+'/addr'), 16)
+        self.offset = int(device.attributes.asstring('maps/map'+str(index)+'/offset'), 16)
+        self.size   = int(device.attributes.asstring('maps/map'+str(index)+'/size'), 16)
 
 class uio (object):
     """UIO class provides user space access to UIO devices.
@@ -43,8 +38,10 @@ class uio (object):
 
     Attributes
     ----------
-    uio_mmaps : :obj:`touple` of :class:`mmap` objects
+    uio_maps : :obj:`touple` of :class:`mmap` objects
         List of all memory maps derived from device tree node for the UIO device.
+    uio_mmaps : :obj:`touple` of :class:`mmap` objects
+        List of all mmap-ed memory maps derived from device tree node for the UIO device.
     """
 
     def __init__(self, uio: str):
@@ -63,25 +60,14 @@ class uio (object):
         except IOError as e:
             raise IOError(e.errno, "Locking {}: {}".format(self.uio_path, e.strerror))
 
-        # mmap all maps listed in device tree
-        self.uio_mmaps = [self._uio_mmap(uio_map) for uio_map in self._uio_maps()]
-
-    def __del__(self):
-        print('UIO __del__ was activated.')
-        # close memory mappings
-        for uio_mmap in self.uio_mmaps:
-            uio_mmap.close()
-        # close uio device (also releases exclusive lock)
-        try:
-            self.uio_dev.close()
-        except OSError as e:
-            raise IOError(e.errno, "Closing {}: {}".format(self.uio_path, e.strerror))
-
-    def _uio_maps(self):
-        # UDEV device path
+        # UDEV device
         device = pyudev.Devices.from_device_file(pyudev.Context(), self.uio_path)
-        # list of UIO map objects
-        return [_uio_map(device, path) for path in os.listdir(os.path.join(device.sys_path, 'maps'))]
+
+        # create list of UIO maps
+        self.uio_maps = [_uio_map(device, int(uio_map[3:])) for uio_map in os.listdir(os.path.join(device.sys_path, 'maps'))]
+
+        # mmap all maps listed in device tree
+        self.uio_mmaps = [self._uio_mmap(uio_map) for uio_map in self.uio_maps]
 
     def _uio_mmap (self, uio_map: _uio_map):
         try:
@@ -93,6 +79,17 @@ class uio (object):
         except OSError as e:
             raise IOError(e.errno, "Mapping {} map {} size {}: {}".format(self.uio_path, uio_map.name, uio_map.size, e.strerror))
         return uio_mmap
+
+    def __del__(self):
+        print('UIO __del__ was activated.')
+        # close memory mappings
+        for uio_mmap in self.uio_mmaps:
+            uio_mmap.close()
+        # close uio device (also releases exclusive lock)
+        try:
+            self.uio_dev.close()
+        except OSError as e:
+            raise IOError(e.errno, "Closing {}: {}".format(self.uio_path, e.strerror))
 
     def pool(self):
         """
