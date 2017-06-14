@@ -1,18 +1,18 @@
+import os
 import fcntl
 import mmap
 
 from pyudev import Devices, Context
-from pathlib import Path
 
 class _uio_map (object):
-    def __init__(self, path: Path):
-        self.index  = int(path.name[-1])
+    def __init__(self, path: str):
+        self.index  = int(path[-1])
         self.name   =     self.read(path, 'name')
         self.addr   = int(self.read(path, 'addr'  ), 16)
         self.offset = int(self.read(path, 'offset'), 16)
         self.size   = int(self.read(path, 'size'  ), 16)
     def read (self, path, name):
-        with Path(path, name).open() as attr:
+        with open(os.path.join(path, name), 'r') as attr:
             return (attr.read())
 
 class uio (object):
@@ -80,11 +80,9 @@ class uio (object):
         # UDEV device path
         uio_udev_path  = Devices.from_device_file(Context(), self.uio_path)
         # UIO maps path
-        uio_maps_path  = Path(uio_udev_path.sys_path, 'maps')
-        # list od UIO maps paths
-        uio_maps_paths = list(uio_maps_path.iterdir())
+        uio_maps_path  = os.path.join(uio_udev_path.sys_path, 'maps')
         # list of UIO map objects
-        return [_uio_map(uio_map_path) for uio_map_path in uio_maps_paths]
+        return [_uio_map(os.path.join(uio_maps_path, uio_map_path)) for uio_map_path in os.listdir(uio_maps_path)]
 
     def _uio_mmap (self, uio_map: _uio_map):
         try:
