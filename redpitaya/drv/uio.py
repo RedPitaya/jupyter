@@ -1,19 +1,20 @@
 import os
 import fcntl
 import mmap
+import pyudev
 
-from pyudev import Devices, Context
+def ashex (self, attribute):
+    return int(self.asstring(attribute), 16)
+
+pyudev.Attributes.ashex = ashex
 
 class _uio_map (object):
-    def __init__(self, path: str):
-        self.index  = int(path[-1])
-        self.name   =     self.read(path, 'name')
-        self.addr   = int(self.read(path, 'addr'  ), 16)
-        self.offset = int(self.read(path, 'offset'), 16)
-        self.size   = int(self.read(path, 'size'  ), 16)
-    def read (self, path, name):
-        with open(os.path.join(path, name), 'r') as attr:
-            return (attr.read())
+    def __init__(self, device, path: str):
+        self.index  = int(path[3:])
+        self.name   = device.attributes.asstring(os.path.join('maps', path, 'name'))
+        self.addr   = device.attributes.ashex   (os.path.join('maps', path, 'addr'))
+        self.offset = device.attributes.ashex   (os.path.join('maps', path, 'offset'))
+        self.size   = device.attributes.ashex   (os.path.join('maps', path, 'size'))
 
 class uio (object):
     """UIO class provides user space access to UIO devices.
@@ -78,11 +79,9 @@ class uio (object):
 
     def _uio_maps(self):
         # UDEV device path
-        uio_udev_path  = Devices.from_device_file(Context(), self.uio_path)
-        # UIO maps path
-        uio_maps_path  = os.path.join(uio_udev_path.sys_path, 'maps')
+        device = pyudev.Devices.from_device_file(pyudev.Context(), self.uio_path)
         # list of UIO map objects
-        return [_uio_map(os.path.join(uio_maps_path, uio_map_path)) for uio_map_path in os.listdir(uio_maps_path)]
+        return [_uio_map(device, path) for path in os.listdir(os.path.join(device.sys_path, 'maps'))]
 
     def _uio_mmap (self, uio_map: _uio_map):
         try:
