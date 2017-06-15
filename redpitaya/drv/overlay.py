@@ -2,9 +2,7 @@ import os
 import time
 
 class overlay (object):
-    """
-    Class handling device tree overlays and FPGA bitstreams.
-    """
+    """Class handling device tree overlays and FPGA bitstreams."""
     overlays = "/sys/kernel/config/device-tree/overlays"
     fpgapath = "/opt/redpitaya/fpga"
 
@@ -47,8 +45,7 @@ class overlay (object):
 #        del(self.overlay)
 
     def status (self) -> bool:
-        """
-        Checking device tree overlay status.
+        """Checking device tree overlay status.
 
         :returns: device tree overlay 'applied' status
         :rtype: bool
