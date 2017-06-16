@@ -45,7 +45,7 @@ class evn ():
         return (bool(self.regset.evn.ctl_sts & self._CTL_TRG_MASK))
 
     @property
-    def sync_src (self) -> tuple:
+    def sync_src (self) -> int:
         """Select for software event sources."""
         return (self.regset.evn.cfg_evn)
 
