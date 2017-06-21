@@ -12,7 +12,6 @@ class asg_per (object):
     # buffer counter ranges
     _CWMr = 2**CWM
     _CWFr = 2**CWF
-    buffer_size = 2**CWM #: table size
 
     class _regset_t (Structure):
         _fields_ = [('cfg_siz', c_uint32),  # size

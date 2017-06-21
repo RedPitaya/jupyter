@@ -19,21 +19,6 @@ class lg (evn, asg_bst, lg_out, uio):
     FS = 125000000.0
     # linear addition multiplication register width
     DW  = 16  #: data width - streaming sample
-    # buffer parameters (fixed point number uM.F)
-    CWM = 14  #: counter width - magnitude (fixed point integer)
-    CWF = 16  #: counter width - fraction  (fixed point fraction)
-    CW  = CWM + CWF
-    # buffer counter ranges
-    _CWMr = 2**CWM
-    _CWFr = 2**CWF
-    buffer_size = 2**CWM #: table size
-    # burst counter parameters
-    CWR = 14  #: counter width - burst data repetition
-    CWL = 32  #: counter width - burst period length
-    CWN = 16  #: counter width - burst period number
-    _CWRr = 2**CWR
-    _CWLr = 2**CWL
-    _CWNr = 2**CWN
 
     class _regset_t (Structure):
         _fields_ = [('evn', evn._regset_t),
@@ -52,6 +37,9 @@ class lg (evn, asg_bst, lg_out, uio):
         self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
         # map buffer table
         self.table = np.frombuffer(self.uio_mmaps[1], 'int32')
+
+        # calculate constants
+        self.buffer_size = 2**CWM #: table size
 
     def __del__ (self):
         # disable output

@@ -5,8 +5,6 @@ class asg_bst (object):
     Generator FPGA module driver.
     """
 
-    #: sampling frequency
-    FS = 125000000.0
     # burst counter parameters
     CWR = 14  #: counter width - burst data repetition
     CWL = 32  #: counter width - burst period length
@@ -53,10 +51,10 @@ class asg_bst (object):
 
     @burst_data_length.setter
     def burst_data_length (self, value: int):
-        if (value <= self._CWMr):
+        if (value <= self.buffer_size):
             self.regset.bst.cfg_bdl = value - 1
         else:
-            raise ValueError("Burst data length should be less or equal to {}.".format(self._CWMr))
+            raise ValueError("Burst data length should be less or equal to {}.".format(self.buffer_size))
 
     @property
     def burst_period_length (self) -> int:
