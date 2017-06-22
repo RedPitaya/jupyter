@@ -38,7 +38,7 @@ class osc (evn, acq, osc_trg, osc_fil, uio):
                     # filter
                     ('fil', osc_fil._regset_t)]
 
-    def __init__ (self, index:int, input_range:float, uio:str = '/dev/uio/osc'):
+    def __init__ (self, index: int, input_range: float, uio: str = '/dev/uio/osc'):
         """Module instance index should be provided"""
 
         # use index
