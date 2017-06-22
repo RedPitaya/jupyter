@@ -42,8 +42,8 @@ class asg_per (object):
     def frequency (self) -> float:
         """Periodic signal frequency up to FS/2"""
         siz = self.regset.per.cfg_siz + 1
-        stp = self.regset.per.cfg_ste + 1
-        return (stp / siz * self.FS)
+        ste = self.regset.per.cfg_ste + 1
+        return (ste / siz * self.FS)
 
     @frequency.setter
     def frequency (self, value: float):
