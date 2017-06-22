@@ -52,12 +52,12 @@ class gen (evn, asg_per, asg_bst, gen_out, wave, uio):
         self.table = np.frombuffer(self.uio_mmaps[1], 'int32')
 
         # calculate constants
-        self.buffer_size = 2**CWM #: table size
+        self.buffer_size = 2**self.CWM #: table size
 
         # logaritmic scale from 0.116Hz to 62.5Mhz
-        _f_min = FS / 2**CW
-        _f_max = FS / 2
-        _f_one = FS / 2**CWM
+        _f_min = self.FS / 2**self.CW
+        _f_max = self.FS / 2
+        _f_one = self.FS / 2**self.CWM
 
     def __del__ (self):
         # disable output
