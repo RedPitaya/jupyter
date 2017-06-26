@@ -34,7 +34,7 @@ class asg_bst (object):
 
     @property
     def burst_data_repetitions (self) -> int:
-        """Burst data repetitions, up to 2**`CWL`."""
+        """Burst data repetitions, up to 2**`CWR`."""
         return (self.regset.bst.cfg_bdr + 1)
 
     @burst_data_repetitions.setter

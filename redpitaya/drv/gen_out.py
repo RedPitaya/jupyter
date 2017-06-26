@@ -3,11 +3,9 @@ import numpy as np
 
 class gen_out(object):
     # linear addition multiplication register width
-    DW  = 14  #: data width - streaming sample
     DWM = 14  #: data width - linear gain multiplier
     DWS = 14  #: data width - linear offset summand
     # fixed point range
-    _DWr  = (1 << (DW -1)) - 1
     _DWMr = (1 << (DWM-2))
     _DWSr = (1 << (DWS-1)) - 1
 
