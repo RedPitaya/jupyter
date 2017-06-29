@@ -6,6 +6,10 @@ class la_rle (object):
                     ('cfg_cur', c_uint32),  # current counter
                     ('cfg_lst', c_uint32)]  # last    counter
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        self.regset.rle.cfg_rle = 0
+
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
         print (

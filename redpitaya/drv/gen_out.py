@@ -14,6 +14,12 @@ class gen_out(object):
                     ('cfg_sum',  c_int32),  # adder (offset)
                     ('cfg_ena', c_uint32)]  # output enable
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        self.regset.out.cfg_mul = int(1 * self._DWMr)
+        self.regset.out.cfg_sum = 0
+        self.regset.out.cfg_ena = 0
+
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
         print (

@@ -67,6 +67,14 @@ class gen (evn, asg_per, asg_bst, gen_out, wave, uio):
         # call parent class init to unmap maps and close UIO device
         super().__del__()
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        evn.default(self)
+        self.regset.cfg_bmd = 0
+        asg_per.default(self)
+        asg_bst.default(self)
+        gen_out.default(self)
+
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
         evn.show_regset(self)

@@ -18,6 +18,12 @@ class asg_per (object):
                     ('cfg_off', c_uint32),  # offset
                     ('cfg_ste', c_uint32)]  # step
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        self.regset.per.cfg_siz = 0
+        self.regset.per.cfg_ste = 0
+        self.regset.per.cfg_off = 0
+
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
         print (

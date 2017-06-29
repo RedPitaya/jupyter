@@ -50,6 +50,15 @@ class clb (uio):
     def __del__ (self):
         super().__del__()
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        for ch in self.channels_adc:
+            self.adc[ch].gain   = self.mul_t.unit
+            self.adc[ch].offset = 0
+        for ch in self.channels_dac:
+            self.dac[ch].gain   = self.mul_t.unit
+            self.dac[ch].offset = 0
+
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         for i in self.channels_dac:

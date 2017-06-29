@@ -29,7 +29,7 @@ class lg (evn, asg_bst, lg_out, uio):
                     ('rsv_002', c_uint32 * 2),
                     ('out', lg_out._regset_t)]
 
-    def __init__ (self, uio: str = '/dev/uio/lg'):
+    def __init__(self, uio: str = '/dev/uio/lg'):
         # call parent class init to open UIO device and mmap maps
         super().__init__(uio)
 
@@ -41,7 +41,7 @@ class lg (evn, asg_bst, lg_out, uio):
         # calculate constants
         self.buffer_size = 2**CWM #: table size
 
-    def __del__ (self):
+    def __del__(self):
         # disable output
         self.enable = False
         # make sure state machine is not running
@@ -49,7 +49,14 @@ class lg (evn, asg_bst, lg_out, uio):
         # call parent class init to unmap maps and close UIO device
         super().__del__()
 
-    def show_regset (self):
+    def default(self):
+        """Set registers into default (power-up) state."""
+        evn.default(self)
+        self.regset.cfg_bmd = 0
+        asg_bst.default(self)
+        la_out.default(self)
+
+    def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         evn.show_regset(self)
         print (

@@ -59,6 +59,16 @@ class osc (evn, acq, osc_trg, osc_fil, uio):
         # call parent class init to unmap maps and close UIO device
         super().__del__()
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        evn.default(self)
+        acq.default(self)
+        osc_trg.default(self)
+        self.regset.cfg_dec = 0
+        self.regset.cfg_shr = 0
+        self.regset.cfg_avg = 0
+        self.input_range = self.input_range
+
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
         evn.show_regset(self)

@@ -40,9 +40,19 @@ class la (evn, acq, la_trg, la_rle, la_msk, uio):
         self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
         # map buffer table
         self.table = np.frombuffer(self.uio_mmaps[1], 'int16')
+
     def __del__ (self):
         # call parent class init to unmap maps and close UIO device
         super().__del__()
+
+    def default(self):
+        """Set registers into default (power-up) state."""
+        evn.default(self)
+        acq.default(self)
+        la_trg.default(self)
+        self.regset.cfg_dec = 0
+        la_rle.default(self)
+        la_msk.default(self)
 
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""

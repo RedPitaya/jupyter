@@ -10,6 +10,13 @@ class osc_trg (object):
                     ('cfg_edg', c_uint32),  # edge (0-pos, 1-neg)
                     ('cfg_hld', c_uint32)]  # hold off time
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        self.regset.trg.cfg_neg = 0
+        self.regset.trg.cfg_pos = 0
+        self.regset.trg.cfg_edg = 0
+        self.regset.trg.cfg_hld = 0
+
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
         print (

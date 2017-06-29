@@ -16,6 +16,13 @@ class la_trg (object):
             "cfg_edg_neg = 0x{reg:08x} = {reg:10d}  # edge negative   \n".format(reg=self.regset.trg.cfg_edg_neg)
         )
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        self.regset.trg.cfg_cmp_msk = 0
+        self.regset.trg.cfg_cmp_val = 0
+        self.regset.trg.cfg_edg_pos = 0
+        self.regset.trg.cfg_edg_neg = 0
+
     @property
     def trigger_mask (self) -> int:
         """Trigger comparator mask."""
@@ -23,7 +30,7 @@ class la_trg (object):
 
     @trigger_mask.setter
     def trigger_mask (self, value: tuple):
-            self.regset.trg.cfg_cmp_msk = value
+        self.regset.trg.cfg_cmp_msk = value
 
     @property
     def trigger_value (self) -> int:
@@ -32,7 +39,7 @@ class la_trg (object):
 
     @trigger_value.setter
     def trigger_value (self, value: tuple):
-            self.regset.trg.cfg_cmp_val = value
+        self.regset.trg.cfg_cmp_val = value
 
     @property
     def trigger_edge (self) -> tuple:

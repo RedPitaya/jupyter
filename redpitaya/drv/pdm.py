@@ -19,6 +19,11 @@ class pdm (uio):
     def __del__ (self):
         super().__del__()
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        for channel in range(self.DN):
+            self.regset.pdm[channel] = 0
+
     def read (self, channel: int) -> int:
         return (self.regset.pdm[channel])
 

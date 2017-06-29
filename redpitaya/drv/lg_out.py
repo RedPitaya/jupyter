@@ -29,6 +29,13 @@ class lg_out (object):
                     ('cfg_msk', c_uint32),  # mask
                     ('cfg_val', c_uint32)]  # value/polarity
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        self.regset.out.cfg_oe0 = 0
+        self.regset.out.cfg_oe1 = 0
+        self.regset.out.cfg_msk = 0
+        self.regset.out.cfg_val = 0
+
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
         print (

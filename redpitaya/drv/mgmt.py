@@ -15,6 +15,11 @@ class mgmt (uio):
     def __del__ (self):
         super().__del__()
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        self.regset.cfg_iom = 0x0
+        self.regset.cfg_loop = 0x0
+
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
         print (

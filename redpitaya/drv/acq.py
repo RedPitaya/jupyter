@@ -21,6 +21,11 @@ class acq (object):
             "sts_pst = 0x{reg:08x} = {reg:10d}  # status post trigger       \n".format(reg=self.regset.acq.sts_pst)
         )
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        self.regset.acq.cfg_pre = 0
+        self.regset.acq.cfg_pst = 0
+
     @property
     def trigger_pre (self) -> int:
         """Pre trigger delay.

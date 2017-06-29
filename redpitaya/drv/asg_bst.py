@@ -21,6 +21,13 @@ class asg_bst (object):
                     ('sts_bln', c_uint32),  # length (current position inside burst length)
                     ('sts_bnm', c_uint32)]  # number (current burst counter)
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        self.regset.bst.cfg_bdr = 0
+        self.regset.bst.cfg_bdl = 0
+        self.regset.bst.cfg_bpl = 0
+        self.regset.bst.cfg_bpn = 0
+
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
         print (

@@ -12,6 +12,11 @@ class evn ():
                     ('cfg_evn', c_uint32),  # software event source select
                     ('cfg_trg', c_uint32)]  # hardware trigger mask
 
+    def default(self):
+        """Set registers into default (power-up) state."""
+        self.regset.evn.cfg_evn = 0 # TODO: it should probably be pointing to itself
+        self.regset.evn.cfg_trg = 0
+
     def show_regset (self):
         """Print FPGA module register set for debugging purposes."""
         print (
