@@ -39,4 +39,3 @@ class fixp (object):
     def fixp2float(self, value: int) -> float:
         """Conversion from ``float`` fixed point."""
         return(float(value)/float(self.unit))
-        
