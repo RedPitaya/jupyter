@@ -50,6 +50,19 @@ class clb (uio):
     def __del__ (self):
         super().__del__()
 
+    def show_regset(self):
+        """Print FPGA module register set for debugging purposes."""
+        for i in self.channels_dac:
+            print (
+                "cfg_mul = 0x{reg:08x} = {reg:10d}  # DAC[{i:d}] multiplication\n".format(reg=self.regset.dac[i].cfg_mul, i=i)+
+                "cfg_sum = 0x{reg:08x} = {reg:10d}  # DAC[{i:d}] summation     \n".format(reg=self.regset.dac[i].cfg_sum, i=i)
+            )
+        for i in self.channels_adc:
+            print (
+                "cfg_mul = 0x{reg:08x} = {reg:10d}  # ADC[{i:d}] multiplication\n".format(reg=self.regset.adc[i].cfg_mul, i=i)+
+                "cfg_sum = 0x{reg:08x} = {reg:10d}  # ADC[{i:d}] summation     \n".format(reg=self.regset.adc[i].cfg_sum, i=i)
+            )
+
     class DAC (object):
         DW = 14
         _DWr = 2**DW - 1
