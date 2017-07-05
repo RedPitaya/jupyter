@@ -43,7 +43,7 @@ class hwid(uio):
 
         A 32bit read only register defined at FPGA compile time.
         """
-        return (self.regset.hwid)
+        return self.regset.hwid
 
     @property
     def efuse(self) -> int:
@@ -51,7 +51,7 @@ class hwid(uio):
 
         A 32bit value, read only for now, future versions might provide a convoluted write access scheme.
         """
-        return (self.regset.efuse)
+        return self.regset.efuse
 
     @property
     def dna(self) -> int:

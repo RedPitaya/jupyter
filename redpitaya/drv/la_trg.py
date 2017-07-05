@@ -27,7 +27,7 @@ class la_trg(object):
     @property
     def trigger_mask(self) -> int:
         """Trigger comparator mask."""
-        return (self.regset.trg.cfg_cmp_msk)
+        return self.regset.trg.cfg_cmp_msk
 
     @trigger_mask.setter
     def trigger_mask(self, value: tuple):
@@ -36,7 +36,7 @@ class la_trg(object):
     @property
     def trigger_value(self) -> int:
         """Trigger comparator value."""
-        return (self.regset.trg.cfg_cmp_val)
+        return self.regset.trg.cfg_cmp_val
 
     @trigger_value.setter
     def trigger_value(self, value: tuple):
@@ -45,7 +45,7 @@ class la_trg(object):
     @property
     def trigger_edge(self) -> tuple:
         """Trigger edge detection mask [pos, neg]."""
-        return ([self.regset.trg.cfg_edg_pos, self.regset.trg.cfg_edg_neg])
+        return [self.regset.trg.cfg_edg_pos, self.regset.trg.cfg_edg_neg]
 
     @trigger_edge.setter
     def trigger_edge(self, value: tuple):

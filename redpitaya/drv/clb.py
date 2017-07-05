@@ -152,16 +152,16 @@ class clb(uio):
 
         # map buffer onto structure
         eeprom_struct = self._eeprom_t.from_buffer_copy(buffer)
-        return(eeprom_struct)
+        return eeprom_struct
 
     def FullScaleToVoltage(self, cnt: int) -> float:
         if cnt == 0:
-            return(1.0)
+            return (1.0)
         else:
-            return(cnt * 100.0 / (1<<32))
+            return (cnt * 100.0 / (1<<32))
 
     def FullScaleFromVoltage(self, voltage: float) -> int:
-        return(int(voltage / 100.0 * (1<<32)))
+        return int(voltage / 100.0 * (1<<32))
 
     def eeprom_parse(self, eeprom_struct):
 
@@ -190,7 +190,7 @@ class clb(uio):
             for ch in self.channels_adc:
                 clb_struct.adc[ch].hi.offset = clb_struct.adc[ch].lo.offset
 
-        return (clb_struct)
+        return clb_struct
 
     def calib_show (self, clb_struct):
         for ch in self.channels_adc:

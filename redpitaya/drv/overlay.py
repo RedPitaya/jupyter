@@ -52,10 +52,10 @@ class overlay(object):
         :rtype: bool
         """
         if not os.path.exists(self.syspath):
-            return (False)
+            return False
         else:
             with open('{}/status'.format(self.syspath), 'r') as status_file:
                 status_string = status_file.read()
-                if   (status_string ==   "applied\n"): return (True)
-                elif (status_string == "unapplied\n"): return (False)
-                else:                                  return (None)
+                if   (status_string ==   "applied\n"): return True
+                elif (status_string == "unapplied\n"): return False
+                else:                                  return None

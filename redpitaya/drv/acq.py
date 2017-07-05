@@ -35,7 +35,7 @@ class acq(object):
         after start() before a trigger event is accepted.
         It makes sense for this number to be up to buffer size.
         """
-        return (self.regset.acq.cfg_pre)
+        return self.regset.acq.cfg_pre
 
     @trigger_pre.setter
     def trigger_pre(self, value: int):
@@ -52,7 +52,7 @@ class acq(object):
         after a trigger, before writing stops automatically.
         It makes sense for this number to be up to buffer size.
         """
-        return (self.regset.acq.cfg_pst)
+        return self.regset.acq.cfg_pst
 
     @trigger_post.setter
     def trigger_post(self, value: int):

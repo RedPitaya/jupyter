@@ -22,7 +22,7 @@ class la_rle(object):
     @property
     def rle(self) -> bool:
         """RLE mode enable."""
-        return (bool(self.regset.rle.cfg_rle))
+        return bool(self.regset.rle.cfg_rle)
 
     @rle.setter
     def rle(self, value: bool):
@@ -31,9 +31,9 @@ class la_rle(object):
     @property
     def counter_current(self) -> int:
         """Current data stream length counter."""
-        return (self.regset.rle.cfg_cur)
+        return self.regset.rle.cfg_cur
 
     @property
     def counter_last(self) -> int:
         """Last data stream length counter."""
-        return (self.regset.rle.cfg_lst)
+        return self.regset.rle.cfg_lst

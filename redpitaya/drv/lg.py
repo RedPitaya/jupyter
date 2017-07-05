@@ -98,7 +98,7 @@ class lg(evn, asg_bst, lg_out, uio):
         * 'FINITE'     - finite    length bursts
         * 'INFINITE'   - inifinite length bursts
         """
-        return (self.modes(self.regset.cfg_bmd))
+        return self.modes(self.regset.cfg_bmd)
 
     @mode.setter
     def mode(self, value: str):

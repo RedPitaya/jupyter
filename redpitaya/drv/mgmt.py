@@ -36,7 +36,7 @@ class mgmt(uio):
         0 - pin is connected to PS GPIO controller
         1 - pin is connected to Logic generator.
         """
-        return (self.regset.cfg_iom)
+        return self.regset.cfg_iom
 
     @gpio_mode.setter
     def gpio_mode(self, value: int):
@@ -50,7 +50,7 @@ class mgmt(uio):
         0 - enable loop: gen0 -> osc0,
         1 - enable loop: gen1 -> osc1.
         """
-        return (self.regset.cfg_loop)
+        return self.regset.cfg_loop
 
     @loop.setter
     def loop(self, value: int):

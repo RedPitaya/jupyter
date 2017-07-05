@@ -44,16 +44,16 @@ class evn():
 
     def status_run(self) -> bool:
         """Run status."""
-        return (bool(self.regset.evn.ctl_sts & self._CTL_STR_MASK))
+        return bool(self.regset.evn.ctl_sts & self._CTL_STR_MASK)
 
     def status_trigger(self) -> bool:
         """Trigger status."""
-        return (bool(self.regset.evn.ctl_sts & self._CTL_TRG_MASK))
+        return bool(self.regset.evn.ctl_sts & self._CTL_TRG_MASK)
 
     @property
     def sync_src(self) -> int:
         """Select for software event sources."""
-        return (self.regset.evn.cfg_evn)
+        return self.regset.evn.cfg_evn
 
     @sync_src.setter
     def sync_src(self, value: int):
@@ -62,7 +62,7 @@ class evn():
     @property
     def trig_src(self) -> int:
         """Enable mask for hardware trigger sources."""
-        return (self.regset.evn.cfg_trg)
+        return self.regset.evn.cfg_trg
 
     @trig_src.setter
     def trig_src(self, value: int):

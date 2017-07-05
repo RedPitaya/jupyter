@@ -9,7 +9,7 @@ class wave():
     """
 
     def _wavetime(self):
-        return (np.linspace(0, 2*np.pi, self.buffer_size, endpoint=False))
+        return np.linspace(0, 2*np.pi, self.buffer_size, endpoint=False)
 
     def sin(self, t: np.array = None) -> np.array:
         """Sinus waveform.

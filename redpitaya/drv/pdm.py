@@ -26,7 +26,7 @@ class pdm(uio):
             self.regset.pdm[channel] = 0
 
     def read(self, channel: int) -> int:
-        return (self.regset.pdm[channel])
+        return self.regset.pdm[channel]
 
     def write(self, channel: int, value: int):
         if (0 <= value <= self._DWr):

@@ -31,7 +31,7 @@ class osc_trg(object):
     def level(self) -> float:
         """Trigger level in vols, or a pair of values [neg, pos] if a hysteresis is desired."""
         scale = self.input_range / self._DWr
-        return ([self.regset.trg.cfg_neg * scale, self.regset.trg.cfg_pos * scale])
+        return [self.regset.trg.cfg_neg * scale, self.regset.trg.cfg_pos * scale]
 
     @level.setter
     def level(self, value: tuple):
@@ -50,7 +50,7 @@ class osc_trg(object):
     @property
     def edge(self) -> str:
         """Trigger edge as a string 'pos'/'neg'"""
-        return (('pos', 'neg')[self.regset.trg.cfg_edg])
+        return ('pos', 'neg')[self.regset.trg.cfg_edg]
 
     @edge.setter
     def edge(self, value: str):

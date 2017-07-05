@@ -30,7 +30,7 @@ class osc_fil(object):
         True   filter is not used
         False  filter is used
         """
-        return (bool(self.regset.fil.cfg_byp))
+        return bool(self.regset.fil.cfg_byp)
 
     @filter_bypass.setter
     def filter_bypass(self, value: bool):

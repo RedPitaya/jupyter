@@ -88,7 +88,7 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
 
         See HW board documentation for details.
         """
-        return (self.__input_range)
+        return self.__input_range
 
     @input_range.setter
     def input_range(self, value: float):
@@ -120,8 +120,7 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
 
     @property
     def average(self) -> bool:
-        # TODO units should be secconds
-        return (bool(self.regset.cfg_avg))
+        return bool(self.regset.cfg_avg)
 
     @average.setter
     def average(self, value: bool):
@@ -159,6 +158,7 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
         if ptr is None:
             ptr = int(self.pointer)
         adr = (self.buffer_size + ptr - siz) % self.buffer_size
+        scale = self.__input_range / float(self._DWr)
         # TODO: avoid making copy of entire array
         table = np.roll(self.table, -ptr)
-        return table.astype('float32')[-siz:] * (self.__input_range / self._DWr)
+        return (table.astype('float32')[-siz:] * scale)

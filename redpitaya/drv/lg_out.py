@@ -49,7 +49,7 @@ class lg_out (object):
     @property
     def enable(self) -> tuple:
         """Output enable [oe0, oe1]."""
-        return ([self.regset.out.cfg_oe0, self.regset.out.cfg_oe1])
+        return [self.regset.out.cfg_oe0, self.regset.out.cfg_oe1]
 
     @enable.setter
     def enable(self, value: tuple):
@@ -60,7 +60,7 @@ class lg_out (object):
     @property
     def mask(self) -> int:
         """Output mask."""
-        return (self.regset.out.cfg_msk)
+        return self.regset.out.cfg_msk
 
     @mask.setter
     def mask(self, value: int):
@@ -69,7 +69,7 @@ class lg_out (object):
     @property
     def value(self) -> int:
         """Output value."""
-        return (self.regset.out.cfg_val)
+        return self.regset.out.cfg_val
 
     @value.setter
     def value(self, value: int):

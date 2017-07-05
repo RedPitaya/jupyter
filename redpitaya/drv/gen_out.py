@@ -56,7 +56,7 @@ class gen_out(object):
     @property
     def enable(self) -> bool:
         """Output enable boolean value."""
-        return (bool(self.regset.out.cfg_ena))
+        return bool(self.regset.out.cfg_ena)
 
     @enable.setter
     def enable(self, value: bool):

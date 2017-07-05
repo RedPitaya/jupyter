@@ -93,8 +93,9 @@ class gen(evn, asg_per, asg_bst, gen_out, wave, uio):
         Array can be up to `buffer_size` samples in length.
         """
         siz = self.table_size
+        scale = float(self._DWr)
         # TODO: nparray
-        return [self.table[i] / self._DWr for i in range(siz)]
+        return [self.table[i] / scale for i in range(siz)]
 
     @waveform.setter
     def waveform(self, value):
@@ -102,7 +103,8 @@ class gen(evn, asg_per, asg_bst, gen_out, wave, uio):
         if (siz <= self.buffer_size):
             for i in range(siz):
                 # TODO add saturation
-                self.table[i] = int(value[i] * self._DWr)
+                scale = float(self._DWr)
+                self.table[i] = int(value[i] * scale)
             self.table_size = siz
         else:
             raise ValueError("Waveform table size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
@@ -120,7 +122,7 @@ class gen(evn, asg_per, asg_bst, gen_out, wave, uio):
         * 'FINITE'     - finite    length bursts
         * 'INFINITE'   - inifinite length bursts
         """
-        return (self.modes(self.regset.cfg_bmd))
+        return self.modes(self.regset.cfg_bmd)
 
     @mode.setter
     def mode(self, value: str):

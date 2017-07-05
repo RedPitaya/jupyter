@@ -21,7 +21,7 @@ class la_msk(object):
     @property
     def input_mask(self) -> int:
         """Input signal bit mask (can be used to reduce power consumption)."""
-        return (self.regset.msk.cfg_msk)
+        return self.regset.msk.cfg_msk
 
     @input_mask.setter
     def input_mask(self, value: int):
@@ -30,7 +30,7 @@ class la_msk(object):
     @property
     def input_polarity(self) -> int:
         """Input signal bit polarity."""
-        return (self.regset.msk.cfg_pol)
+        return self.regset.msk.cfg_pol
 
     @input_polarity.setter
     def input_polarity(self, value: int):
