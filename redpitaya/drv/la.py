@@ -11,16 +11,17 @@ from .la_rle  import la_rle
 from .la_msk  import la_msk
 from .uio     import uio
 
-class la (evn, acq, la_trg, la_rle, la_msk, uio):
+
+class la(evn, acq, la_trg, la_rle, la_msk, uio):
     #: sampling frequency
     FS = 125000000.0
     #: register width - linear addition multiplication
     DW = 16
     # fixed point range
-    _DWr  = (1 << (DW-1)) - 1
+    _DWr = (1 << (DW-1)) - 1
     # buffer parameters
-    buffer_size = 2**14 #: buffer size
-    CW = 31 #: counter size
+    buffer_size = 2**14  #: buffer size
+    CW = 31  #: counter size
     _CWr = 2**CW
 
     class _regset_t (Structure):
@@ -32,7 +33,7 @@ class la (evn, acq, la_trg, la_rle, la_msk, uio):
                     ('rle', la_rle._regset_t),  # RLE
                     ('msk', la_msk._regset_t)]  # mask/polarity
 
-    def __init__ (self, uio:str = '/dev/uio/la'):
+    def __init__(self, uio: str = '/dev/uio/la'):
         # call parent class init to open UIO device and map regset
         super().__init__(uio)
 
@@ -41,7 +42,7 @@ class la (evn, acq, la_trg, la_rle, la_msk, uio):
         # map buffer table
         self.table = np.frombuffer(self.uio_mmaps[1], 'int16')
 
-    def __del__ (self):
+    def __del__(self):
         # call parent class init to unmap maps and close UIO device
         super().__del__()
 
@@ -54,39 +55,39 @@ class la (evn, acq, la_trg, la_rle, la_msk, uio):
         la_rle.default(self)
         la_msk.default(self)
 
-    def show_regset (self):
+    def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         evn.show_regset(self)
         acq.show_regset(self)
         la_trg.show_regset(self)
-        print (
-            "cfg_dec = 0x{reg:08x} = {reg:10d}  # decimation factor         \n".format(reg=self.regset.cfg_dec)
+        print(
+            "cfg_dec = 0x{reg:08x} = {reg:10d}  # decimation factor\n".format(reg = self.regset.cfg_dec)
         )
         la_rle.show_regset(self)
         la_msk.show_regset(self)
 
     @property
-    def decimation (self) -> int:
+    def decimation(self) -> int:
         """Decimation factor."""
         return (self.regset.cfg_dec + 1)
 
     @decimation.setter
-    def decimation (self, value: int):
+    def decimation(self, value: int):
         # TODO check range
         self.regset.cfg_dec = value - 1
 
     @property
-    def sample_rate (self) -> float:
+    def sample_rate(self) -> float:
         """Sample rate depending on decimation factor."""
         return (self.FS / self.decimation)
 
     @property
-    def sample_period (self) -> float:
+    def sample_period(self) -> float:
         """Sample period depending on decimation factor."""
         return (1 / self.sample_rate)
 
     @property
-    def pointer (self):
+    def pointer(self):
         # mask out overflow bit and sum pre and post trigger counters
         cnt = self.trigger_pre_status + self.trigger_post_status
         adr = cnt % self.buffer_size

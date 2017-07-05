@@ -10,7 +10,8 @@ from .asg_bst import asg_bst
 from .lg_out  import lg_out
 from .uio     import uio
 
-class lg (evn, asg_bst, lg_out, uio):
+
+class lg(evn, asg_bst, lg_out, uio):
     """
     Generator FPGA module driver.
     """
@@ -20,7 +21,7 @@ class lg (evn, asg_bst, lg_out, uio):
     # linear addition multiplication register width
     DW  = 16  #: data width - streaming sample
 
-    class _regset_t (Structure):
+    class _regset_t(Structure):
         _fields_ = [('evn', evn._regset_t),
                     ('rsv_000', c_uint32),
                     ('cfg_bmd', c_uint32),  # mode [1:0] = [inf, ben]
@@ -39,7 +40,7 @@ class lg (evn, asg_bst, lg_out, uio):
         self.table = np.frombuffer(self.uio_mmaps[1], 'int32')
 
         # calculate constants
-        self.buffer_size = 2**CWM #: table size
+        self.buffer_size = 2**CWM  #: table size
 
     def __del__(self):
         # disable output
@@ -59,14 +60,14 @@ class lg (evn, asg_bst, lg_out, uio):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         evn.show_regset(self)
-        print (
-            "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg=self.regset.cfg_bmd)
+        print(
+            "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg = self.regset.cfg_bmd)
         )
         asg_bst.show_regset(self)
         lg_out.show_regset(self)
 
     @property
-    def waveform (self):
+    def waveform(self):
         """Waveworm array containing normalized values in the range [-1,1].
 
         Array can be up to `buffer_size` samples in length.
@@ -76,7 +77,7 @@ class lg (evn, asg_bst, lg_out, uio):
         return [self.table[i] for i in range(siz)]
 
     @waveform.setter
-    def waveform (self, value):
+    def waveform(self, value):
         siz = len(value)
         if (siz <= self.buffer_size):
             for i in range(siz):
@@ -91,7 +92,7 @@ class lg (evn, asg_bst, lg_out, uio):
         INFINITE   = 0x3
 
     @property
-    def mode (self) -> str:
+    def mode(self) -> str:
         """Logic generator mode:
 
         * 'FINITE'     - finite    length bursts
@@ -100,7 +101,7 @@ class lg (evn, asg_bst, lg_out, uio):
         return (self.modes(self.regset.cfg_bmd))
 
     @mode.setter
-    def mode (self, value: str):
+    def mode(self, value: str):
         if isinstance(value, str):
             self.regset.cfg_bmd = self.modes[value].value
         else:

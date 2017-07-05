@@ -10,7 +10,8 @@ from .osc_trg import osc_trg
 from .osc_fil import osc_fil
 from .uio     import uio
 
-class osc (evn, acq, osc_trg, osc_fil, uio):
+
+class osc(evn, acq, osc_trg, osc_fil, uio):
     #: sampling frequency
     FS = 125000000.0
     #: register width - linear addition multiplication
@@ -18,14 +19,14 @@ class osc (evn, acq, osc_trg, osc_fil, uio):
     # fixed point range
     _DWr  = (1 << (DW-1)) - 1
     # buffer parameters
-    buffer_size = 2**14 #: buffer size
-    CW = 31 #: counter size
+    buffer_size = 2**14  #: buffer size
+    CW = 31  #: counter size
     _CWr = 2**CW
 
     #: analog stage range voltages
     ranges = (1.0, 20.0)
 
-    class _regset_t (Structure):
+    class _regset_t(Structure):
         _fields_ = [('evn', evn._regset_t),
                     ('rsv_000', c_uint32),
                     ('acq', acq._regset_t),  # pre/post trigger counters
@@ -38,7 +39,7 @@ class osc (evn, acq, osc_trg, osc_fil, uio):
                     # filter
                     ('fil', osc_fil._regset_t)]
 
-    def __init__ (self, index: int, input_range: float, uio: str = '/dev/uio/osc'):
+    def __init__(self, index: int, input_range: float, uio: str = '/dev/uio/osc'):
         """Module instance index should be provided"""
 
         # use index
@@ -55,7 +56,7 @@ class osc (evn, acq, osc_trg, osc_fil, uio):
         # set input range (there is no default)
         self.input_range = input_range
 
-    def __del__ (self):
+    def __del__(self):
         # call parent class init to unmap maps and close UIO device
         super().__del__()
 
@@ -69,20 +70,20 @@ class osc (evn, acq, osc_trg, osc_fil, uio):
         self.regset.cfg_avg = 0
         self.input_range = self.input_range
 
-    def show_regset (self):
+    def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         evn.show_regset(self)
         acq.show_regset(self)
         osc_trg.show_regset(self)
-        print (
-            "cfg_dec = 0x{reg:08x} = {reg:10d}  # decimation factor         \n".format(reg=self.regset.cfg_dec)+
-            "cfg_shr = 0x{reg:08x} = {reg:10d}  # shift right               \n".format(reg=self.regset.cfg_shr)+
-            "cfg_avg = 0x{reg:08x} = {reg:10d}  # average enable            \n".format(reg=self.regset.cfg_avg)
+        print(
+            "cfg_dec = 0x{reg:08x} = {reg:10d}  # decimation factor         \n".format(reg = self.regset.cfg_dec) +
+            "cfg_shr = 0x{reg:08x} = {reg:10d}  # shift right               \n".format(reg = self.regset.cfg_shr) +
+            "cfg_avg = 0x{reg:08x} = {reg:10d}  # average enable            \n".format(reg = self.regset.cfg_avg)
         )
         osc_fil.show_regset(self)
 
     @property
-    def input_range (self) -> float:
+    def input_range(self) -> float:
         """Input range can be one of the supporte ranges.
 
         See HW board documentation for details.
@@ -90,7 +91,7 @@ class osc (evn, acq, osc_trg, osc_fil, uio):
         return (self.__input_range)
 
     @input_range.setter
-    def input_range (self, value: float):
+    def input_range(self, value: float):
         if value in self.ranges:
             self.__input_range = value
             self.filter_coeficients = self._filters[value]
@@ -98,39 +99,39 @@ class osc (evn, acq, osc_trg, osc_fil, uio):
             raise ValueError("Input range can be one of {} volts.".format(self.ranges))
 
     @property
-    def decimation (self) -> int:
+    def decimation(self) -> int:
         """Decimation factor."""
         return (self.regset.cfg_dec + 1)
 
     @decimation.setter
-    def decimation (self, value: int):
+    def decimation(self, value: int):
         # TODO check range
         self.regset.cfg_dec = value - 1
 
     @property
-    def sample_rate (self) -> float:
+    def sample_rate(self) -> float:
         """Sample rate depending on decimation factor."""
         return (self.FS / self.decimation)
 
     @property
-    def sample_period (self) -> float:
+    def sample_period(self) -> float:
         """Sample period depending on decimation factor."""
         return (1 / self.sample_rate)
 
     @property
-    def average (self) -> bool:
+    def average(self) -> bool:
         # TODO units should be secconds
         return (bool(self.regset.cfg_avg))
 
     @average.setter
-    def average (self, value: bool):
+    def average(self, value: bool):
         # TODO check range, for non 2**n decimation factors,
         # scaling should be applied in addition to shift
         self.regset.cfg_avg = int(value)
         self.regset.cfg_shr = math.ceil(math.log2(self.decimation))
 
     @property
-    def pointer (self):
+    def pointer(self):
         # mask out overflow bit and sum pre and post trigger counters
         cnt = self.trigger_pre_status + self.trigger_post_status
         adr = cnt % self.buffer_size

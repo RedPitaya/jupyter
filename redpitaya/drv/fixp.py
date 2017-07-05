@@ -33,6 +33,7 @@ class fixp (object):
     def float2fixp(self, value: float) -> int:
         """Conversion from ``float`` fixed point."""
         if ((not self.s) and (value < 0)):
+            raise ValueError("This fixed point number is unsigned, so negative values are not supported.")
         else:
             return(int(value*self.unit))
 

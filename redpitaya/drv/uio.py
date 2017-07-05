@@ -3,7 +3,8 @@ import fcntl
 import mmap
 import pyudev
 
-class _uio_map (object):
+
+class _uio_map(object):
     def __init__(self, device, index: int):
         self.index  = index
         self.name   =     device.attributes.asstring('maps/map'+str(index)+'/name')
@@ -11,7 +12,8 @@ class _uio_map (object):
         self.offset = int(device.attributes.asstring('maps/map'+str(index)+'/offset'), 16)
         self.size   = int(device.attributes.asstring('maps/map'+str(index)+'/size'), 16)
 
-class uio (object):
+
+class uio(object):
     """UIO class provides user space access to UIO devices.
 
     When instantiating this class the next steps are performed:
@@ -69,7 +71,7 @@ class uio (object):
         # mmap all maps listed in device tree
         self.uio_mmaps = [self._uio_mmap(uio_map) for uio_map in self.uio_maps]
 
-    def _uio_mmap (self, uio_map: _uio_map):
+    def _uio_mmap(self, uio_map: _uio_map):
         try:
             uio_mmap = mmap.mmap(fileno = self.uio_dev.fileno(),
                                  length = uio_map.size,
