@@ -14,9 +14,9 @@ class la_rle(object):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_rle = 0x{reg:08x} = {reg:10d}  # RLE mode       \n".format(reg = self.regset.rle.cfg_rle) +
-            "cfg_cur = 0x{reg:08x} = {reg:10d}  # current counter\n".format(reg = self.regset.rle.cfg_cur) +
-            "cfg_lst = 0x{reg:08x} = {reg:10d}  # last    counter\n".format(reg = self.regset.rle.cfg_lst)
+            "cfg_rle = 0x{reg:08x} = {reg:10d}  # RLE mode       \n".format(reg=self.regset.rle.cfg_rle) +
+            "cfg_cur = 0x{reg:08x} = {reg:10d}  # current counter\n".format(reg=self.regset.rle.cfg_cur) +
+            "cfg_lst = 0x{reg:08x} = {reg:10d}  # last    counter\n".format(reg=self.regset.rle.cfg_lst)
         )
 
     @property

@@ -80,7 +80,7 @@ class gen(evn, asg_per, asg_bst, gen_out, wave, uio):
         """Print FPGA module register set for debugging purposes."""
         evn.show_regset(self)
         print(
-            "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg = self.regset.cfg_bmd)
+            "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg=self.regset.cfg_bmd)
         )
         asg_per.show_regset(self)
         asg_bst.show_regset(self)

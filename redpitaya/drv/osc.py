@@ -76,9 +76,9 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
         acq.show_regset(self)
         osc_trg.show_regset(self)
         print(
-            "cfg_dec = 0x{reg:08x} = {reg:10d}  # decimation factor         \n".format(reg = self.regset.cfg_dec) +
-            "cfg_shr = 0x{reg:08x} = {reg:10d}  # shift right               \n".format(reg = self.regset.cfg_shr) +
-            "cfg_avg = 0x{reg:08x} = {reg:10d}  # average enable            \n".format(reg = self.regset.cfg_avg)
+            "cfg_dec = 0x{reg:08x} = {reg:10d}  # decimation factor\n".format(reg=self.regset.cfg_dec) +
+            "cfg_shr = 0x{reg:08x} = {reg:10d}  # shift right      \n".format(reg=self.regset.cfg_shr) +
+            "cfg_avg = 0x{reg:08x} = {reg:10d}  # average enable   \n".format(reg=self.regset.cfg_avg)
         )
         osc_fil.show_regset(self)
 

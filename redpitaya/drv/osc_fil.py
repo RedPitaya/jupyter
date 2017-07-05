@@ -16,11 +16,11 @@ class osc_fil(object):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_byp = 0x{reg:08x} = {reg:10d}  # bypass       \n".format(reg = self.regset.fil.cfg_byp) +
-            "cfg_faa = 0x{reg:08x} = {reg:10d}  # AA coeficient\n".format(reg = self.regset.fil.cfg_faa) +
-            "cfg_fbb = 0x{reg:08x} = {reg:10d}  # BB coeficient\n".format(reg = self.regset.fil.cfg_fbb) +
-            "cfg_fkk = 0x{reg:08x} = {reg:10d}  # KK coeficient\n".format(reg = self.regset.fil.cfg_fkk) +
-            "cfg_fpp = 0x{reg:08x} = {reg:10d}  # PP coeficient\n".format(reg = self.regset.fil.cfg_fpp)
+            "cfg_byp = 0x{reg:08x} = {reg:10d}  # bypass       \n".format(reg=self.regset.fil.cfg_byp) +
+            "cfg_faa = 0x{reg:08x} = {reg:10d}  # AA coeficient\n".format(reg=self.regset.fil.cfg_faa) +
+            "cfg_fbb = 0x{reg:08x} = {reg:10d}  # BB coeficient\n".format(reg=self.regset.fil.cfg_fbb) +
+            "cfg_fkk = 0x{reg:08x} = {reg:10d}  # KK coeficient\n".format(reg=self.regset.fil.cfg_fkk) +
+            "cfg_fpp = 0x{reg:08x} = {reg:10d}  # PP coeficient\n".format(reg=self.regset.fil.cfg_fpp)
         )
 
     @property

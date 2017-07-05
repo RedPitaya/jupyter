@@ -61,7 +61,7 @@ class la(evn, acq, la_trg, la_rle, la_msk, uio):
         acq.show_regset(self)
         la_trg.show_regset(self)
         print(
-            "cfg_dec = 0x{reg:08x} = {reg:10d}  # decimation factor\n".format(reg = self.regset.cfg_dec)
+            "cfg_dec = 0x{reg:08x} = {reg:10d}  # decimation factor\n".format(reg=self.regset.cfg_dec)
         )
         la_rle.show_regset(self)
         la_msk.show_regset(self)

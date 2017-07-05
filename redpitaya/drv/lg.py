@@ -61,7 +61,7 @@ class lg(evn, asg_bst, lg_out, uio):
         """Print FPGA module register set for debugging purposes."""
         evn.show_regset(self)
         print(
-            "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg = self.regset.cfg_bmd)
+            "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg=self.regset.cfg_bmd)
         )
         asg_bst.show_regset(self)
         lg_out.show_regset(self)

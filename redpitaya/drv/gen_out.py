@@ -24,9 +24,9 @@ class gen_out(object):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_mul = 0x{reg:08x} = {reg:10d}  # multiplier (amplitude)\n".format(reg = self.regset.out.cfg_mul) +
-            "cfg_sum = 0x{reg:08x} = {reg:10d}  # adder (offset)        \n".format(reg = self.regset.out.cfg_sum) +
-            "cfg_ena = 0x{reg:08x} = {reg:10d}  # output enable         \n".format(reg = self.regset.out.cfg_ena)
+            "cfg_mul = 0x{reg:08x} = {reg:10d}  # multiplier (amplitude)\n".format(reg=self.regset.out.cfg_mul) +
+            "cfg_sum = 0x{reg:08x} = {reg:10d}  # adder (offset)        \n".format(reg=self.regset.out.cfg_sum) +
+            "cfg_ena = 0x{reg:08x} = {reg:10d}  # output enable         \n".format(reg=self.regset.out.cfg_ena)
         )
 
     @property

@@ -21,9 +21,9 @@ class evn():
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "ctl_sts = 0x{reg:08x} = {reg:10d}  # control/status        \n".format(reg = self.regset.evn.ctl_sts) +
-            "cfg_evn = 0x{reg:08x} = {reg:10d}  # SW event source select\n".format(reg = self.regset.evn.cfg_evn) +
-            "cfg_trg = 0x{reg:08x} = {reg:10d}  # HW trigger mask       \n".format(reg = self.regset.evn.cfg_trg)
+            "ctl_sts = 0x{reg:08x} = {reg:10d}  # control/status        \n".format(reg=self.regset.evn.ctl_sts) +
+            "cfg_evn = 0x{reg:08x} = {reg:10d}  # SW event source select\n".format(reg=self.regset.evn.cfg_evn) +
+            "cfg_trg = 0x{reg:08x} = {reg:10d}  # HW trigger mask       \n".format(reg=self.regset.evn.cfg_trg)
         )
 
     def reset(self):

@@ -28,9 +28,9 @@ class asg_per(object):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_siz = 0x{reg:08x} = {reg:10d}  # table size  \n".format(reg = self.regset.per.cfg_siz) +
-            "cfg_off = 0x{reg:08x} = {reg:10d}  # table offset\n".format(reg = self.regset.per.cfg_off) +
-            "cfg_ste = 0x{reg:08x} = {reg:10d}  # table step  \n".format(reg = self.regset.per.cfg_ste)
+            "cfg_siz = 0x{reg:08x} = {reg:10d}  # table size  \n".format(reg=self.regset.per.cfg_siz) +
+            "cfg_off = 0x{reg:08x} = {reg:10d}  # table offset\n".format(reg=self.regset.per.cfg_off) +
+            "cfg_ste = 0x{reg:08x} = {reg:10d}  # table step  \n".format(reg=self.regset.per.cfg_ste)
         )
 
     @property

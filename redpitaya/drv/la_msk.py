@@ -14,8 +14,8 @@ class la_msk(object):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_msk = 0x{reg:08x} = {reg:10d}  # input mask    \n".format(reg = self.regset.msk.cfg_msk) +
-            "cfg_pol = 0x{reg:08x} = {reg:10d}  # input polarity\n".format(reg = self.regset.msk.cfg_pol)
+            "cfg_msk = 0x{reg:08x} = {reg:10d}  # input mask    \n".format(reg=self.regset.msk.cfg_msk) +
+            "cfg_pol = 0x{reg:08x} = {reg:10d}  # input polarity\n".format(reg=self.regset.msk.cfg_pol)
         )
 
     @property

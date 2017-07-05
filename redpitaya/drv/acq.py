@@ -16,10 +16,10 @@ class acq(object):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_pre = 0x{reg:08x} = {reg:10d}  # delay pre  trigger        \n".format(reg = self.regset.acq.cfg_pre) +
-            "cfg_pst = 0x{reg:08x} = {reg:10d}  # delay post trigger        \n".format(reg = self.regset.acq.cfg_pst) +
-            "sts_pre = 0x{reg:08x} = {reg:10d}  # status pre  trigger       \n".format(reg = self.regset.acq.sts_pre) +
-            "sts_pst = 0x{reg:08x} = {reg:10d}  # status post trigger       \n".format(reg = self.regset.acq.sts_pst)
+            "cfg_pre = 0x{reg:08x} = {reg:10d}  # delay pre  trigger        \n".format(reg=self.regset.acq.cfg_pre) +
+            "cfg_pst = 0x{reg:08x} = {reg:10d}  # delay post trigger        \n".format(reg=self.regset.acq.cfg_pst) +
+            "sts_pre = 0x{reg:08x} = {reg:10d}  # status pre  trigger       \n".format(reg=self.regset.acq.sts_pre) +
+            "sts_pst = 0x{reg:08x} = {reg:10d}  # status post trigger       \n".format(reg=self.regset.acq.sts_pst)
         )
 
     def default(self):

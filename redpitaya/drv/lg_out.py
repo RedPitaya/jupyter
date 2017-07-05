@@ -40,10 +40,10 @@ class lg_out (object):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_oe0 = 0x{reg:08x} = {reg:10d}  # output enable 0\n".format(reg = self.regset.out.cfg_oe0) +
-            "cfg_oe1 = 0x{reg:08x} = {reg:10d}  # output enable 1\n".format(reg = self.regset.out.cfg_oe1) +
-            "cfg_msk = 0x{reg:08x} = {reg:10d}  # output mask    \n".format(reg = self.regset.out.cfg_msk) +
-            "cfg_val = 0x{reg:08x} = {reg:10d}  # value/polarity \n".format(reg = self.regset.out.cfg_val)
+            "cfg_oe0 = 0x{reg:08x} = {reg:10d}  # output enable 0\n".format(reg=self.regset.out.cfg_oe0) +
+            "cfg_oe1 = 0x{reg:08x} = {reg:10d}  # output enable 1\n".format(reg=self.regset.out.cfg_oe1) +
+            "cfg_msk = 0x{reg:08x} = {reg:10d}  # output mask    \n".format(reg=self.regset.out.cfg_msk) +
+            "cfg_val = 0x{reg:08x} = {reg:10d}  # value/polarity \n".format(reg=self.regset.out.cfg_val)
         )
 
     @property

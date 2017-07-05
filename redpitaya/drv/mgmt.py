@@ -24,8 +24,8 @@ class mgmt(uio):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_iom  = 0x{reg:08x} = {reg:10d}  # GPIO mode    \n".format(reg = self.regset.cfg_iom) +
-            "cfg_loop = 0x{reg:08x} = {reg:10d}  # gen->osc loop\n".format(reg = self.regset.cfg_loop)
+            "cfg_iom  = 0x{reg:08x} = {reg:10d}  # GPIO mode    \n".format(reg=self.regset.cfg_iom) +
+            "cfg_loop = 0x{reg:08x} = {reg:10d}  # gen->osc loop\n".format(reg=self.regset.cfg_loop)
         )
 
     @property

@@ -21,10 +21,10 @@ class osc_trg(object):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_neg = 0x{reg:08x} = {reg:10d}  # negative level     \n".format(reg = self.regset.trg.cfg_neg) +
-            "cfg_pos = 0x{reg:08x} = {reg:10d}  # positive level     \n".format(reg = self.regset.trg.cfg_pos) +
-            "cfg_edg = 0x{reg:08x} = {reg:10d}  # edge (0-pos, 1-neg)\n".format(reg = self.regset.trg.cfg_edg) +
-            "cfg_hld = 0x{reg:08x} = {reg:10d}  # hold off time      \n".format(reg = self.regset.trg.cfg_hld)
+            "cfg_neg = 0x{reg:08x} = {reg:10d}  # negative level     \n".format(reg=self.regset.trg.cfg_neg) +
+            "cfg_pos = 0x{reg:08x} = {reg:10d}  # positive level     \n".format(reg=self.regset.trg.cfg_pos) +
+            "cfg_edg = 0x{reg:08x} = {reg:10d}  # edge (0-pos, 1-neg)\n".format(reg=self.regset.trg.cfg_edg) +
+            "cfg_hld = 0x{reg:08x} = {reg:10d}  # hold off time      \n".format(reg=self.regset.trg.cfg_hld)
         )
 
     @property

@@ -11,10 +11,10 @@ class la_trg(object):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_cmp_msk = 0x{reg:08x} = {reg:10d}  # comparator mask \n".format(reg = self.regset.trg.cfg_cmp_msk) +
-            "cfg_cmp_val = 0x{reg:08x} = {reg:10d}  # comparator value\n".format(reg = self.regset.trg.cfg_cmp_val) +
-            "cfg_edg_pos = 0x{reg:08x} = {reg:10d}  # edge positive   \n".format(reg = self.regset.trg.cfg_edg_pos) +
-            "cfg_edg_neg = 0x{reg:08x} = {reg:10d}  # edge negative   \n".format(reg = self.regset.trg.cfg_edg_neg)
+            "cfg_cmp_msk = 0x{reg:08x} = {reg:10d}  # comparator mask \n".format(reg=self.regset.trg.cfg_cmp_msk) +
+            "cfg_cmp_val = 0x{reg:08x} = {reg:10d}  # comparator value\n".format(reg=self.regset.trg.cfg_cmp_val) +
+            "cfg_edg_pos = 0x{reg:08x} = {reg:10d}  # edge positive   \n".format(reg=self.regset.trg.cfg_edg_pos) +
+            "cfg_edg_neg = 0x{reg:08x} = {reg:10d}  # edge negative   \n".format(reg=self.regset.trg.cfg_edg_neg)
         )
 
     def default(self):

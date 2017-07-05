@@ -32,12 +32,12 @@ class asg_bst (object):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_bdr = 0x{reg:08x} = {reg:10d}  # burst data   repetition        \n".format(reg = self.regset.bst.cfg_bdr) +
-            "cfg_bdl = 0x{reg:08x} = {reg:10d}  # burst data   length            \n".format(reg = self.regset.bst.cfg_bdl) +
-            "cfg_bpl = 0x{reg:08x} = {reg:10d}  # burst period length            \n".format(reg = self.regset.bst.cfg_bpl) +
-            "cfg_bpn = 0x{reg:08x} = {reg:10d}  # burst period number            \n".format(reg = self.regset.bst.cfg_bpn) +
-            "sts_bln = 0x{reg:08x} = {reg:10d}  # burst length (current position)\n".format(reg = self.regset.bst.sts_bln) +
-            "sts_bnm = 0x{reg:08x} = {reg:10d}  # burst number (current counter) \n".format(reg = self.regset.bst.sts_bnm)
+            "cfg_bdr = 0x{reg:08x} = {reg:10d}  # burst data   repetition        \n".format(reg=self.regset.bst.cfg_bdr) +
+            "cfg_bdl = 0x{reg:08x} = {reg:10d}  # burst data   length            \n".format(reg=self.regset.bst.cfg_bdl) +
+            "cfg_bpl = 0x{reg:08x} = {reg:10d}  # burst period length            \n".format(reg=self.regset.bst.cfg_bpl) +
+            "cfg_bpn = 0x{reg:08x} = {reg:10d}  # burst period number            \n".format(reg=self.regset.bst.cfg_bpn) +
+            "sts_bln = 0x{reg:08x} = {reg:10d}  # burst length (current position)\n".format(reg=self.regset.bst.sts_bln) +
+            "sts_bnm = 0x{reg:08x} = {reg:10d}  # burst number (current counter) \n".format(reg=self.regset.bst.sts_bnm)
         )
 
     @property
