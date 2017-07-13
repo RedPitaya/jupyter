@@ -2,6 +2,7 @@ import os
 import fcntl
 import mmap
 import pyudev
+from ctypes import c_uint32
 
 
 class _uio_map(object):
@@ -93,8 +94,32 @@ class uio(object):
         except OSError as e:
             raise IOError(e.errno, "Closing {}: {}".format(self.uio_path, e.strerror))
 
+    def irq_enable(self):
+        """Enable interrupt."""
+        cnt = c_uint32(1);
+        try:
+            self.uio_dev.write(bytearray(cnt))
+        except OSError as e:
+            raise IOError(e.errno, "Enable IRQ {}: {}".format(self.uio_path, e.strerror));
+
+    def irq_disable(self):
+        """Disable interrupt."""
+        cnt = c_uint32(0);
+        try:
+            self.uio_dev.write(bytearray(cnt))
+        except OSError as e:
+            raise IOError(e.errno, "Disable IRQ {}: {}".format(self.uio_path, e.strerror));
+
+    def irq_wait(self):
+        """Wait for interrupt."""
+        try:
+            status = self.uio_dev.read(4)
+        except OSError as e:
+            raise IOError(e.errno, "Wait for IRQ {}: {}".format(self.uio_path, e.strerror));
+        # import sys
+        # cnt = int.from_bytes(status, byteorder=sys.byteorder)
+
     def pool(self):
-        """
-        TODO: implement interrupt support
+        """TODO: implement interrupt support
         """
         pass
