@@ -39,10 +39,10 @@ class acq(object):
 
     @trigger_pre.setter
     def trigger_pre(self, value: int):
-        if (value < self._CWr):
+        if (0 <= value < self._CWr):
             self.regset.acq.cfg_pre = value
         else:
-            raise ValueError("Pre trigger delay should be less or equal to {}.".format(self._CWr))
+            raise ValueError("Pre trigger delay should be positive and less or equal to {}.".format(self._CWr))
 
     @property
     def trigger_post(self) -> int:
@@ -56,10 +56,10 @@ class acq(object):
 
     @trigger_post.setter
     def trigger_post(self, value: int):
-        if (value < self._CWr):
+        if (0 <= value < self._CWr):
             self.regset.acq.cfg_pst = value
         else:
-            raise ValueError("Post trigger delay should be less or equal to {}.".format(self._CWr))
+            raise ValueError("Post trigger delay should be positive and less or equal to {}.".format(self._CWr))
         # TODO check range
 
     @property

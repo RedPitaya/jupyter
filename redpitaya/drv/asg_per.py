@@ -43,7 +43,7 @@ class asg_per(object):
         if (0 < value <= self.buffer_size):
             self.regset.per.cfg_siz = (value << self.CWF) - 1
         else:
-            raise ValueError("Waveform table size should in range from 0 to buffer size. buffer_size = {}".format(self.buffer_size))
+            raise ValueError("Waveform table size should in range from 1 to buffer size. buffer_size = {}".format(self.buffer_size))
 
     @property
     def frequency(self) -> float:

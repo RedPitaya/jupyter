@@ -50,7 +50,7 @@ class asg_bst (object):
         if (0 < value <= self._CWRr):
             self.regset.bst.cfg_bdr = value - 1
         else:
-            raise ValueError("Burst data repetitions should be in range from 0 to {}.".format(self._CWRr))
+            raise ValueError("Burst data repetitions should be in range from 1 to {}.".format(self._CWRr))
 
     @property
     def burst_data_length(self) -> int:
@@ -62,7 +62,7 @@ class asg_bst (object):
         if (0 < value <= self.buffer_size):
             self.regset.bst.cfg_bdl = value - 1
         else:
-            raise ValueError("Burst data length should be in range from 0 to {}.".format(self.buffer_size))
+            raise ValueError("Burst data length should be in range from 1 to {}.".format(self.buffer_size))
 
     @property
     def burst_period_length(self) -> int:
@@ -74,7 +74,7 @@ class asg_bst (object):
         if (0 < value <= self._CWLr):
             self.regset.bst.cfg_bpl = value - 1
         else:
-            raise ValueError("Burst period length should be in range from 0 to {}.".format(self._CWLr))
+            raise ValueError("Burst period length should be in range from 1 to {}.".format(self._CWLr))
 
     @property
     def burst_period_number(self) -> int:
@@ -86,4 +86,4 @@ class asg_bst (object):
         if (0 < value <= self._CWNr):
             self.regset.bst.cfg_bpn = value - 1
         else:
-            raise ValueError("Burst period number should be in range from 0 to {}.".format(self._CWNr))
+            raise ValueError("Burst period number should be in range from 1 to {}.".format(self._CWNr))
