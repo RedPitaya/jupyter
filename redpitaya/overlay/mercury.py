@@ -29,27 +29,20 @@ class mercury(overlay):
 
     _modules = tuple(['gen'+str(ch) for ch in range(_MNG)] + ['osc'+str(ch) for ch in range(_MNO)] + ['lg', 'la'])
     # TODO: it is unclear why the next line fails
-    # sync_src = {event_sources[i]:            i  for i in range(len(_modules))}
-    # trig_src = {event_sources[i]: 0b01 << (2*i) for i in range(len(_modules))}
-    # last_src = {event_sources[i]: 0b10 << (2*i) for i in range(len(_modules))}
+    # sync_src = {event_sources[i]:      i for i in range(len(_modules))}
+    # trig_src = {event_sources[i]: 1 << i for i in range(len(_modules))}
     sync_src = {'gen0': 0,
                 'gen1': 1,
                 'osc0': 2,
                 'osc1': 3,
                 'lg'  : 4,
                 'la'  : 5}
-    trig_src = {'gen0': 0b000000000001,
-                'gen1': 0b000000000100,
-                'osc0': 0b000000010000,
-                'osc1': 0b000001000000,
-                'lg'  : 0b000100000000,
-                'la'  : 0b010000000000}
-    last_src = {'gen0': 0b000000000010,
-                'gen1': 0b000000001000,
-                'osc0': 0b000000100000,
-                'osc1': 0b000010000000,
-                'lg'  : 0b001000000000,
-                'la'  : 0b100000000000}
+    trig_src = {'gen0': 1 << 0,
+                'gen1': 1 << 1,
+                'osc0': 1 << 2,
+                'osc1': 1 << 3,
+                'lg'  : 1 << 4,
+                'la'  : 1 << 5}
 
     class led(LED):
         leds = range(8)
