@@ -21,6 +21,8 @@ class lg(evn, asg_bst, lg_out, uio):
     # linear addition multiplication register width
     DW  = 16  #: data width - streaming sample
 
+    CWM = 14
+
     class _regset_t(Structure):
         _fields_ = [('evn', evn._regset_t),
                     ('rsv_000', c_uint32),
@@ -40,7 +42,7 @@ class lg(evn, asg_bst, lg_out, uio):
         self.table = np.frombuffer(self.uio_mmaps[1], 'int32')
 
         # calculate constants
-        self.buffer_size = 2**CWM  #: table size
+        self.buffer_size = 2**self.CWM  #: table size
 
     def __del__(self):
         # disable output
