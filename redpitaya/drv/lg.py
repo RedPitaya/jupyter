@@ -26,7 +26,7 @@ class lg(evn, asg_bst, lg_out, uio):
     class _regset_t(Structure):
         _fields_ = [('evn', evn._regset_t),
                     ('rsv_000', c_uint32),
-                    ('cfg_bmd', c_uint32),  # mode [1:0] = [inf, ben]
+                    ('cfg_bmd', c_uint32),  # mode
                     ('rsv_001', c_uint32 * 3),
                     ('bst', asg_bst._regset_t),
                     ('rsv_002', c_uint32 * 2),
@@ -88,23 +88,3 @@ class lg(evn, asg_bst, lg_out, uio):
             self.table_size = siz
         else:
             raise ValueError("Waveform table size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
-
-    class modes(Enum):
-        FINITE     = 0x1
-        INFINITE   = 0x3
-
-    @property
-    def mode(self) -> str:
-        """Logic generator mode:
-
-        * 'FINITE'     - finite    length bursts
-        * 'INFINITE'   - inifinite length bursts
-        """
-        return self.modes(self.regset.cfg_bmd)
-
-    @mode.setter
-    def mode(self, value: str):
-        if isinstance(value, str):
-            self.regset.cfg_bmd = self.modes[value].value
-        else:
-            raise ValueError("Logic generator supports modes ['FINITE', 'INFINITE'].")
