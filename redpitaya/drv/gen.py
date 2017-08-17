@@ -38,6 +38,10 @@ class gen(evn, asg_per, asg_bst, gen_out, wave, uio):
                     ('rsv_001', c_uint32 * 2),
                     ('out', gen_out._regset_t)]
 
+    class _buffer_t(Array):
+        _length_ = 2**14
+        _type_   = c_int32
+
     def __init__(self, index: int, uio: str = '/dev/uio/gen'):
         """Module instance index should be provided"""
 
@@ -49,11 +53,11 @@ class gen(evn, asg_per, asg_bst, gen_out, wave, uio):
 
         # map regset
         self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
-        # map buffer table
-        self.table = np.frombuffer(self.uio_mmaps[1], 'int32')
+        # map buffer
+        self.buffer = self._buffer_t.from_buffer(self.uio_mmaps[1])
 
         # calculate constants
-        self.buffer_size = 2**self.CWM  #: table size
+        self.buffer_size = 2**self.CWM  #: buffer size
 
         # logaritmic scale from 0.116Hz to 62.5Mhz
         _f_min = self.FS / 2**self.CW
@@ -95,7 +99,7 @@ class gen(evn, asg_per, asg_bst, gen_out, wave, uio):
         siz = self.table_size
         scale = float(self._DWr)
         # TODO: nparray
-        return [self.table[i] / scale for i in range(siz)]
+        return [self.buffer[i] / scale for i in range(siz)]
 
     @waveform.setter
     def waveform(self, value):
@@ -104,10 +108,10 @@ class gen(evn, asg_per, asg_bst, gen_out, wave, uio):
             for i in range(siz):
                 # TODO add saturation
                 scale = float(self._DWr)
-                self.table[i] = int(value[i] * scale)
+                self.buffer[i] = int(value[i] * scale)
             self.table_size = siz
         else:
-            raise ValueError("Waveform table size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
+            raise ValueError("Waveform buffer size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
 
     class modes(Enum):
         PERIODIC = 0x0

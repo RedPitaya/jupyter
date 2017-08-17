@@ -39,6 +39,10 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
                     # filter
                     ('fil', osc_fil._regset_t)]
 
+    class _buffer_t(Array):
+        _length_ = 2**14
+        _type_   = c_int16
+
     def __init__(self, index: int, input_range: float, uio: str = '/dev/uio/osc'):
         """Module instance index should be provided"""
 
@@ -51,7 +55,7 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
         # map regset
         self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
         # map buffer table
-        self.table = np.frombuffer(self.uio_mmaps[1], 'int16')
+        self.table = self._buffer_t.from_buffer(self.uio_mmaps[1])
 
         # set input range (there is no default)
         self.input_range = input_range
@@ -160,5 +164,5 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
         adr = (self.buffer_size + ptr - siz) % self.buffer_size
         scale = self.__input_range / float(self._DWr)
         # TODO: avoid making copy of entire array
-        table = np.roll(self.table, -ptr)
-        return (table.astype('float32')[-siz:] * scale)
+        buffer = np.roll(self.buffer, -ptr)
+        return (buffer.astype('float32')[-siz:] * scale)
