@@ -78,12 +78,18 @@ class asg_bst (object):
 
     @property
     def burst_period_number(self) -> int:
-        """Number of burst period reperitions, up to 2**`CWN`."""
-        return (self.regset.bst.cfg_bpn + 1)
+        """Number of burst period reperitions, up to 2**`CWN`, value `0` produces infinite repetition."""
+        value = self.regset.bst.cfg_bpn
+        if (value & 0x80000000):
+            return (0)
+        else:
+            return (value + 1)
 
     @burst_period_number.setter
     def burst_period_number(self, value: int):
-        if (0 < value <= self._CWNr):
+        if (value == 0):
+            self.regset.bst.cfg_bpn = 0x80000000
+        elif (0 < value <= self._CWNr):
             self.regset.bst.cfg_bpn = value - 1
         else:
-            raise ValueError("Burst period number should be in range from 1 to {}.".format(self._CWNr))
+            raise ValueError("Burst period number should be in range from 1 to {}, or 0 for inifinite bursts.".format(self._CWNr))
