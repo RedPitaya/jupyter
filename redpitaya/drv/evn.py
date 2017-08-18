@@ -42,6 +42,10 @@ class evn():
         """Activate SW trigger."""
         self.regset.evn.ctl_sts = self._CTL_TRG_MASK
 
+    def start_trigger(self):
+        """Start state machine and activate SW trigger."""
+        self.regset.evn.ctl_sts = self._CTL_TRG_MASK | self._CTL_STR_MASK
+
     def status_run(self) -> bool:
         """Run status."""
         return bool(self.regset.evn.ctl_sts & self._CTL_STR_MASK)
