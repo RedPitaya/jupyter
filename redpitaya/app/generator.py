@@ -69,7 +69,7 @@ class generator (object):
             self.reset()
             self.sync_src = overlay.sync_src['gen'+str(ch)]
             self.trig_src = 0
-            self.mode         = 'CONTINUOUS'
+            self.mode      = 'PERIODIC'
             self.amplitude = 0
             self.offset    = 0
             self.set_waveform()
