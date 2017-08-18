@@ -60,9 +60,9 @@ class gen(evn, asg_per, asg_bst, gen_out, wave, uio):
         self.buffer_size = 2**self.CWM  #: buffer size
 
         # logaritmic scale from 0.116Hz to 62.5Mhz
-        _f_min = self.FS / 2**self.CW
-        _f_max = self.FS / 2
-        _f_one = self.FS / 2**self.CWM
+        self._f_min = self.FS / 2**self.CW
+        self._f_max = self.FS / 2
+        self._f_one = self.FS / 2**self.CWM
 
     def __del__(self):
         # disable output
