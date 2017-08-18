@@ -96,10 +96,9 @@ class gen(evn, asg_per, asg_bst, gen_out, wave, uio):
 
         Array can be up to `buffer_size` samples in length.
         """
-        siz = self.table_size
         scale = float(self._DWr)
         # TODO: nparray
-        return [self.buffer[i] / scale for i in range(siz)]
+        return [self.buffer[i] / scale for i in range(self.waveform_size)]
 
     @waveform.setter
     def waveform(self, value):
@@ -109,7 +108,7 @@ class gen(evn, asg_per, asg_bst, gen_out, wave, uio):
                 # TODO add saturation
                 scale = float(self._DWr)
                 self.buffer[i] = int(value[i] * scale)
-            self.table_size = siz
+            self.waveform_size = siz
         else:
             raise ValueError("Waveform buffer size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
 

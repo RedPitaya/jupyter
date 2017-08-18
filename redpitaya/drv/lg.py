@@ -32,17 +32,21 @@ class lg(evn, asg_bst, lg_out, uio):
                     ('rsv_002', c_uint32 * 2),
                     ('out', lg_out._regset_t)]
 
+    class _buffer_t(Array):
+        _length_ = 2**14
+        _type_   = c_int32
+
     def __init__(self, uio: str = '/dev/uio/lg'):
         # call parent class init to open UIO device and mmap maps
         super().__init__(uio)
 
         # map regset
         self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
-        # map buffer table
-        self.table = np.frombuffer(self.uio_mmaps[1], 'int32')
+        # map buffer
+        self.buffer = self._buffer_t.from_buffer(self.uio_mmaps[1])
 
         # calculate constants
-        self.buffer_size = 2**self.CWM  #: table size
+        self.buffer_size = 2**self.CWM  #: buffer size
 
     def __del__(self):
         # disable output
@@ -74,9 +78,8 @@ class lg(evn, asg_bst, lg_out, uio):
 
         Array can be up to `buffer_size` samples in length.
         """
-        siz = self.table_size
         # TODO: nparray
-        return [self.table[i] for i in range(siz)]
+        return [self.buffer[i] for i in range(self.waveform_size)]
 
     @waveform.setter
     def waveform(self, value):
@@ -84,7 +87,7 @@ class lg(evn, asg_bst, lg_out, uio):
         if (siz <= self.buffer_size):
             for i in range(siz):
                 # TODO add saturation
-                self.table[i] = value[i]
-            self.table_size = siz
+                self.buffer[i] = value[i]
+            self.waveform_size = siz
         else:
-            raise ValueError("Waveform table size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
+            raise ValueError("Waveform array size should not excede buffer size. buffer_size = {}".format(self.buffer_size))

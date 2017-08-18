@@ -33,14 +33,18 @@ class la(evn, acq, la_trg, la_rle, la_msk, uio):
                     ('rle', la_rle._regset_t),  # RLE
                     ('msk', la_msk._regset_t)]  # mask/polarity
 
+    class _buffer_t(Array):
+        _length_ = 2**14
+        _type_   = c_int16
+
     def __init__(self, uio: str = '/dev/uio/la'):
         # call parent class init to open UIO device and map regset
         super().__init__(uio)
 
         # map regset
         self.regset = self._regset_t.from_buffer(self.uio_mmaps[0])
-        # map buffer table
-        self.table = np.frombuffer(self.uio_mmaps[1], 'int16')
+        # map buffer
+        self.buffer = self._buffer_t.from_buffer(self.uio_mmaps[1])
 
     def __del__(self):
         # call parent class init to unmap maps and close UIO device
@@ -115,5 +119,5 @@ class la(evn, acq, la_trg, la_rle, la_msk, uio):
             ptr = int(self.pointer)
         adr = (self.buffer_size + ptr - siz) % self.buffer_size
         # TODO: avoid making copy of entire array
-        table = np.roll(self.table, -ptr)
-        return table.astype('uint16')[-siz:]
+        wave = np.roll(self.buffer, -ptr)
+        return wave.astype('uint16')[-siz:]

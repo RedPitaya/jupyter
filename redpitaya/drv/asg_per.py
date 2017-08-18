@@ -28,22 +28,22 @@ class asg_per(object):
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         print(
-            "cfg_siz = 0x{reg:08x} = {reg:10d}  # table size  \n".format(reg=self.regset.per.cfg_siz) +
-            "cfg_off = 0x{reg:08x} = {reg:10d}  # table offset\n".format(reg=self.regset.per.cfg_off) +
-            "cfg_ste = 0x{reg:08x} = {reg:10d}  # table step  \n".format(reg=self.regset.per.cfg_ste)
+            "cfg_siz = 0x{reg:08x} = {reg:10d}  # waveform size  \n".format(reg=self.regset.per.cfg_siz) +
+            "cfg_off = 0x{reg:08x} = {reg:10d}  # waveform offset\n".format(reg=self.regset.per.cfg_off) +
+            "cfg_ste = 0x{reg:08x} = {reg:10d}  # waveform step  \n".format(reg=self.regset.per.cfg_ste)
         )
 
     @property
-    def table_size(self) -> int:
-        """Waveform table size."""
+    def waveform_size(self) -> int:
+        """Waveform size."""
         return ((self.regset.per.cfg_siz + 1) >> self.CWF)
 
-    @table_size.setter
-    def table_size(self, value: int):
+    @waveform_size.setter
+    def waveform_size(self, value: int):
         if (0 < value <= self.buffer_size):
             self.regset.per.cfg_siz = (value << self.CWF) - 1
         else:
-            raise ValueError("Waveform table size should in range from 1 to buffer size. buffer_size = {}".format(self.buffer_size))
+            raise ValueError("Waveform size should in range from 1 to buffer size. buffer_size = {}".format(self.buffer_size))
 
     @property
     def frequency(self) -> float:
