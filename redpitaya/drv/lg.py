@@ -36,7 +36,7 @@ class lg(evn, asg_bst, lg_out, uio):
         _length_ = 2**14
         _type_   = c_int32
 
-    def __init__(self, uio: str = '/dev/uio/lg'):
+    def __init__(self, uio: str = '/dev/uio/lg', dat_t: fixp = fixp())
         # call parent class init to open UIO device and mmap maps
         super().__init__(uio)
 
@@ -59,7 +59,7 @@ class lg(evn, asg_bst, lg_out, uio):
     def default(self):
         """Set registers into default (power-up) state."""
         evn.default(self)
-        self.regset.cfg_bmd = 0
+        self.regset.cfg_mod = 0
         asg_bst.default(self)
         la_out.default(self)
 
@@ -67,7 +67,7 @@ class lg(evn, asg_bst, lg_out, uio):
         """Print FPGA module register set for debugging purposes."""
         evn.show_regset(self)
         print(
-            "cfg_bmd = 0x{reg:08x} = {reg:10d}  # burst mode [1:0] = [inf, ben]  \n".format(reg=self.regset.cfg_bmd)
+            "cfg_mod = 0x{reg:08x} = {reg:10d}  # burst mode\n".format(reg=self.regset.cfg_mod)
         )
         asg_bst.show_regset(self)
         lg_out.show_regset(self)
@@ -86,8 +86,7 @@ class lg(evn, asg_bst, lg_out, uio):
         siz = len(value)
         if (siz <= self.buffer_size):
             for i in range(siz):
-                # TODO add saturation
                 self.buffer[i] = value[i]
             self.waveform_size = siz
         else:
-            raise ValueError("Waveform array size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
+            raise ValueError("Waveform table size should not excede buffer size. buffer_size = {}".format(self.buffer_size))
