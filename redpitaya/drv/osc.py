@@ -32,6 +32,7 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
                     ('acq', acq._regset_t),  # pre/post trigger counters
                     # edge detection
                     ('trg', osc_trg._regset_t),
+                    ('rsv_001', c_uint32),
                     # decimation
                     ('cfg_dec', c_uint32),  # decimation factor
                     ('cfg_shr', c_uint32),  # shift right

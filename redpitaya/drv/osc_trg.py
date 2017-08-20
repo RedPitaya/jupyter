@@ -8,15 +8,13 @@ class osc_trg(object):
     class _regset_t(Structure):
         _fields_ = [('cfg_neg',  c_int32),  # negative level
                     ('cfg_pos',  c_int32),  # positive level
-                    ('cfg_edg', c_uint32),  # edge (0-pos, 1-neg)
-                    ('cfg_hld', c_uint32)]  # hold off time
+                    ('cfg_edg', c_uint32)]  # edge (0-pos, 1-neg)
 
     def default(self):
         """Set registers into default (power-up) state."""
         self.regset.trg.cfg_neg = 0
         self.regset.trg.cfg_pos = 0
         self.regset.trg.cfg_edg = 0
-        self.regset.trg.cfg_hld = 0
 
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
@@ -24,7 +22,6 @@ class osc_trg(object):
             "cfg_neg = 0x{reg:08x} = {reg:10d}  # negative level     \n".format(reg=self.regset.trg.cfg_neg) +
             "cfg_pos = 0x{reg:08x} = {reg:10d}  # positive level     \n".format(reg=self.regset.trg.cfg_pos) +
             "cfg_edg = 0x{reg:08x} = {reg:10d}  # edge (0-pos, 1-neg)\n".format(reg=self.regset.trg.cfg_edg) +
-            "cfg_hld = 0x{reg:08x} = {reg:10d}  # hold off time      \n".format(reg=self.regset.trg.cfg_hld)
         )
 
     @property
@@ -58,13 +55,3 @@ class osc_trg(object):
             self.regset.trg.cfg_edg = self._edges[value]
         else:
             raise ValueError("Trigger edge should be one of {}".format(list(self._edges.keys())))
-
-    @property
-    def holdoff(self) -> int:
-        """Trigger hold off time in clock periods"""
-        return self.regset.trg.cfg_hld
-
-    @holdoff.setter
-    def holdoff(self, value: int):
-        # TODO: check range
-        self.regset.trg.cfg_hld = value
