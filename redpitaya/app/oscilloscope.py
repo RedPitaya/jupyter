@@ -110,9 +110,7 @@ class oscilloscope (object):
         ch = 0
         if self.osc[ch].edg is 'pos': level = self.osc[ch].level[1]
         else                        : level = self.osc[ch].level[0]
-        self.h_trigger_t = [self.p.line ([0,0], [-rmax, +rmax], color="black", line_width=1, line_alpha=0.75),
-                            self.p.quad(left=[0], right=[self.osc[ch].holdoff],
-                                        bottom=[-rmax], top=[+rmax], color="grey", alpha=0.25)]
+        self.h_trigger_t = [self.p.line ([0,0], [-rmax, +rmax], color="black", line_width=1, line_alpha=0.75)]
         self.h_trigger_a = [self.p.line ([self.x[0], self.x[-1]], [level]*2, color="black", line_width=1, line_alpha=0.75),
                             self.p.quad(bottom=[self.osc[ch].level[0]], top=[self.osc[ch].level[1]],
                                         left=[self.x[0]], right=[self.x[-1]], color="grey", alpha=0.25)]
@@ -191,9 +189,6 @@ class oscilloscope (object):
             self.h_trigger_a[0].data_source.data['y'] = [osc.level[1]]*2
         elif (osc.edge == 'neg'):
             self.h_trigger_a[0].data_source.data['y'] = [osc.level[0]]*2
-        # trigger hold off time
-        #self.h_trigger_t[0].data_source.data['x']     = [osc.holdoff]*2
-        self.h_trigger_t[1].data_source.data['right'] = [osc.holdoff]
         push_notebook(handle=self.target)
 
 
@@ -232,10 +227,9 @@ class oscilloscope (object):
             # decimation rate
             self.decimation = 1
 
-            # trigger level [V], edge and holdoff [periods]
+            # trigger level [V] and edge
             self.level = [-0.1, +0.1]
             self.edg = 'pos'
-            self.holdoff = 0
 
             # control event mask
             self.sync_src = overlay.sync_src['osc0']
@@ -245,19 +239,16 @@ class oscilloscope (object):
             # create widgets
             self.w_t_edge     = ipw.ToggleButtons    (value=self.edge, options=['pos', 'neg'], description='T edge')
             self.w_t_position = ipw.FloatRangeSlider (value=self.level, min=-1.0, max=+1.0, step=0.02, description='T position')
-            self.w_t_holdoff  = ipw.FloatSlider      (value=self.holdoff, min=0, max=1, step=0.1, description='T hold off')
             self.w_y_position = ipw.FloatSlider      (value=self.y_position, min=-1.0, max=+1.0, step=0.01, description='Y position')
             self.w_y_scale    = ipw.SelectionSlider  (value=self.y_scale, options=self.y_scales, description='Y scale')
 
             # style widgets
             self.w_t_position.layout = ipw.Layout(width='100%')
-            self.w_t_holdoff.layout  = ipw.Layout(width='100%')
             self.w_y_scale.layout    = ipw.Layout(width='100%')
             self.w_y_position.layout = ipw.Layout(width='100%')
 
             self.w_t_edge.observe     (self.clb_t_edge    , names='value')
             self.w_t_position.observe (self.clb_t_position, names='value')
-            self.w_t_holdoff.observe  (self.clb_t_holdoff , names='value')
             self.w_y_scale.observe    (self.clb_y_scale   , names='value')
             self.w_y_position.observe (self.clb_y_position, names='value')
 
@@ -267,10 +258,6 @@ class oscilloscope (object):
 
         def clb_t_position (self, change):
             self.level = change['new']
-            self.top.clb_t_update()
-
-        def clb_t_holdoff (self, change):
-            self.holdoff = change['new']
             self.top.clb_t_update()
 
         def clb_y_position (self, change):
@@ -290,4 +277,4 @@ class oscilloscope (object):
             self.top.clb_y_update()
 
         def display (self):
-            display(self.w_t_edge, self.w_t_position, self.w_t_holdoff, self.w_y_position, self.w_y_scale)
+            display(self.w_t_edge, self.w_t_position, self.w_y_position, self.w_y_scale)
