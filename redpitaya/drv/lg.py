@@ -36,7 +36,7 @@ class lg(evn, asg_bst, lg_out, uio):
         _length_ = 2**14
         _type_   = c_int32
 
-    def __init__(self, uio: str = '/dev/uio/lg', dat_t: fixp = fixp())
+    def __init__(self, uio: str = '/dev/uio/lg'):
         # call parent class init to open UIO device and mmap maps
         super().__init__(uio)
 
