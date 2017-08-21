@@ -108,8 +108,8 @@ class oscilloscope (object):
 
         # trigger time/amplitude
         ch = 0
-        if self.osc[ch].edg is 'pos': level = self.osc[ch].level[1]
-        else                        : level = self.osc[ch].level[0]
+        if self.osc[ch].edge is 'pos': level = self.osc[ch].level[1]
+        else                         : level = self.osc[ch].level[0]
         self.h_trigger_t = [self.p.line ([0,0], [-rmax, +rmax], color="black", line_width=1, line_alpha=0.75)]
         self.h_trigger_a = [self.p.line ([self.x[0], self.x[-1]], [level]*2, color="black", line_width=1, line_alpha=0.75),
                             self.p.quad(bottom=[self.osc[ch].level[0]], top=[self.osc[ch].level[1]],
@@ -229,7 +229,7 @@ class oscilloscope (object):
 
             # trigger level [V] and edge
             self.level = [-0.1, +0.1]
-            self.edg = 'pos'
+            self.edge = 'pos'
 
             # control event mask
             self.sync_src = overlay.sync_src['osc0']
