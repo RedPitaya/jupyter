@@ -33,10 +33,6 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
                     # edge detection
                     ('trg', osc_trg._regset_t),
                     ('rsv_001', c_uint32),
-                    # decimation
-                    ('cfg_dec', c_uint32),  # decimation factor
-                    ('cfg_shr', c_uint32),  # shift right
-                    ('cfg_avg', c_uint32),  # average enable
                     # filter
                     ('fil', osc_fil._regset_t)]
 
@@ -70,9 +66,7 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
         evn.default(self)
         acq.default(self)
         osc_trg.default(self)
-        self.regset.cfg_dec = 0
-        self.regset.cfg_shr = 0
-        self.regset.cfg_avg = 0
+        osc_fil.default(self)
         self.input_range = self.input_range
 
     def show_regset(self):
@@ -80,11 +74,6 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
         evn.show_regset(self)
         acq.show_regset(self)
         osc_trg.show_regset(self)
-        print(
-            "cfg_dec = 0x{reg:08x} = {reg:10d}  # decimation factor\n".format(reg=self.regset.cfg_dec) +
-            "cfg_shr = 0x{reg:08x} = {reg:10d}  # shift right      \n".format(reg=self.regset.cfg_shr) +
-            "cfg_avg = 0x{reg:08x} = {reg:10d}  # average enable   \n".format(reg=self.regset.cfg_avg)
-        )
         osc_fil.show_regset(self)
 
     @property
@@ -104,16 +93,6 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
             raise ValueError("Input range can be one of {} volts.".format(self.ranges))
 
     @property
-    def decimation(self) -> int:
-        """Decimation factor."""
-        return (self.regset.cfg_dec + 1)
-
-    @decimation.setter
-    def decimation(self, value: int):
-        # TODO check range
-        self.regset.cfg_dec = value - 1
-
-    @property
     def sample_rate(self) -> float:
         """Sample rate depending on decimation factor."""
         return (self.FS / self.decimation)
@@ -122,17 +101,6 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
     def sample_period(self) -> float:
         """Sample period depending on decimation factor."""
         return (1 / self.sample_rate)
-
-    @property
-    def average(self) -> bool:
-        return bool(self.regset.cfg_avg)
-
-    @average.setter
-    def average(self, value: bool):
-        # TODO check range, for non 2**n decimation factors,
-        # scaling should be applied in addition to shift
-        self.regset.cfg_avg = int(value)
-        self.regset.cfg_shr = math.ceil(math.log2(self.decimation))
 
     @property
     def pointer(self):
