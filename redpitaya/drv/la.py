@@ -29,8 +29,8 @@ class la(evn, acq, la_trg, la_rle, la_msk, uio):
                     ('rsv_000', c_uint32),
                     ('acq', acq._regset_t),     # pre/post trigger counters
                     ('trg', la_trg._regset_t),  # trigger (value, edge) detection
-                    ('cfg_dec', c_uint32),      # decimation factor
                     ('rle', la_rle._regset_t),  # RLE
+                    ('rsv_001', c_uint32),
                     ('msk', la_msk._regset_t)]  # mask/polarity
 
     class _buffer_t(Array):
@@ -55,7 +55,6 @@ class la(evn, acq, la_trg, la_rle, la_msk, uio):
         evn.default(self)
         acq.default(self)
         la_trg.default(self)
-        self.regset.cfg_dec = 0
         la_rle.default(self)
         la_msk.default(self)
 
@@ -64,21 +63,8 @@ class la(evn, acq, la_trg, la_rle, la_msk, uio):
         evn.show_regset(self)
         acq.show_regset(self)
         la_trg.show_regset(self)
-        print(
-            "cfg_dec = 0x{reg:08x} = {reg:10d}  # decimation factor\n".format(reg=self.regset.cfg_dec)
-        )
         la_rle.show_regset(self)
         la_msk.show_regset(self)
-
-    @property
-    def decimation(self) -> int:
-        """Decimation factor."""
-        return (self.regset.cfg_dec + 1)
-
-    @decimation.setter
-    def decimation(self, value: int):
-        # TODO check range
-        self.regset.cfg_dec = value - 1
 
     @property
     def sample_rate(self) -> float:
