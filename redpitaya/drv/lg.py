@@ -59,16 +59,12 @@ class lg(evn, asg_bst, lg_out, uio):
     def default(self):
         """Set registers into default (power-up) state."""
         evn.default(self)
-        self.regset.cfg_mod = 0
         asg_bst.default(self)
-        la_out.default(self)
+        lg_out.default(self)
 
     def show_regset(self):
         """Print FPGA module register set for debugging purposes."""
         evn.show_regset(self)
-        print(
-            "cfg_mod = 0x{reg:08x} = {reg:10d}  # burst mode\n".format(reg=self.regset.cfg_mod)
-        )
         asg_bst.show_regset(self)
         lg_out.show_regset(self)
 
