@@ -96,7 +96,7 @@ class mercury(overlay):
 
         def write(self, ch: int, value: float):
             if (0 <= value <= self.V):
-                super().write(ch, value / self.V * super().DWr)
+                super().write(ch, int(value / self.V * super()._DWr))
             else:
                 raise ValueError("Output amplitude should be inside [0,{}] volts.".format(self.V))
 
