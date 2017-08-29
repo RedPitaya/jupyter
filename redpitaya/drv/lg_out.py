@@ -32,7 +32,8 @@ class lg_out (object):
 
     def default(self):
         """Set registers into default (power-up) state."""
-        self.regset.out.cfg_oen = [0, 0]
+        self.regset.out.cfg_oen[0] = 0
+        self.regset.out.cfg_oen[1] = 0
         self.regset.out.cfg_msk = 0
         self.regset.out.cfg_val = 0
 
@@ -41,20 +42,21 @@ class lg_out (object):
         print(
             "cfg_oen[0] = 0x{reg:08x} = {reg:10d}  # output enable 0\n".format(reg=self.regset.out.cfg_oen[0]) +
             "cfg_oen[1] = 0x{reg:08x} = {reg:10d}  # output enable 1\n".format(reg=self.regset.out.cfg_oen[1]) +
-            "cfg_msk = 0x{reg:08x} = {reg:10d}  # output mask    \n".format(reg=self.regset.out.cfg_msk) +
-            "cfg_val = 0x{reg:08x} = {reg:10d}  # value/polarity \n".format(reg=self.regset.out.cfg_val)
+            "cfg_msk    = 0x{reg:08x} = {reg:10d}  # output mask    \n".format(reg=self.regset.out.cfg_msk) +
+            "cfg_val    = 0x{reg:08x} = {reg:10d}  # value/polarity \n".format(reg=self.regset.out.cfg_val)
         )
 
     @property
-    def enable(self) -> tuple:
+    def enable(self) -> _regset_t.cfg_oen:
         """Output enable [oe0, oe1]."""
-        return [self.regset.out.cfg_oen]
+        return self.regset.out.cfg_oen
 
     @enable.setter
     def enable(self, value: tuple):
         if isinstance(value, int):
             value = [value]*2
-        self.regset.out.cfg_oen = value
+        self.regset.out.cfg_oen[0] = value[0]
+        self.regset.out.cfg_oen[1] = value[1]
 
     @property
     def mask(self) -> int:
