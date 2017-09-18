@@ -67,7 +67,7 @@ class lg_out (object):
         """
         return self.regset.out.cfg_mod
 
-    @mask.setter
+    @mode.setter
     def mode(self, value: int):
         self.regset.out.cfg_mod = value
 
