@@ -68,7 +68,9 @@ class mercury(overlay):
     class analog_in():
         channels = {0: 'vaux8', 1: 'vaux0', 2: 'vaux1', 3: 'vaux9'}
         ctx = iio.Context()
-        dev = ctx.devices[3]
+        # dev = ctx.devices[2] 
+        # changes by explanation on https://forum.redpitaya.com/viewtopic.php?t=23485
+        dev = ctx.find_device("iio:device1")
         # resistor divider
         resdiv = 4.99 / (30.0 + 4.99)
 
