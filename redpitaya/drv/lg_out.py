@@ -6,7 +6,7 @@ class lg_out (object):
     """Logic generator output control.
 
     +----------------+----------------+-------------+----------------+-------------+-------------------------------+
-    | ``cfg_oen[0]`` | ``cfg_oen[1]`` | ``cfg_mod`` | ``cfg_val``    | **output**  |  **output**                   |
+    | ``cfg_oen[0]`` | ``cfg_oen[1]`` | ``cfg_msk`` | ``cfg_val``    | **output**  |  **output**                   |
     |  out enable 0  |  out enable 1  |  out mask   | value/polarity | **enable**  | **equation**                  |
     +================+================+=============+================+=============+===============================+
     | 0              | 0              | x           | x              | Hi-Z        | ``z``                         |
@@ -27,14 +27,14 @@ class lg_out (object):
 
     class _regset_t (Structure):
         _fields_ = [('cfg_oen', c_uint32 *2),  # output enable [0,1]
-                    ('cfg_mod', c_uint32   ),  # mask
+                    ('cfg_msk', c_uint32   ),  # mask
                     ('cfg_val', c_uint32   )]  # value/polarity
 
     def default(self):
         """Set registers into default (power-up) state."""
         self.regset.out.cfg_oen[0] = 0
         self.regset.out.cfg_oen[1] = 0
-        self.regset.out.cfg_mod = 0
+        self.regset.out.cfg_msk = 0
         self.regset.out.cfg_val = 0
 
     def show_regset(self):
@@ -42,7 +42,7 @@ class lg_out (object):
         print(
             "cfg_oen[0] = 0x{reg:08x} = {reg:10d}  # output enable 0\n".format(reg=self.regset.out.cfg_oen[0]) +
             "cfg_oen[1] = 0x{reg:08x} = {reg:10d}  # output enable 1\n".format(reg=self.regset.out.cfg_oen[1]) +
-            "cfg_mod    = 0x{reg:08x} = {reg:10d}  # output mask    \n".format(reg=self.regset.out.cfg_mod) +
+            "cfg_msk    = 0x{reg:08x} = {reg:10d}  # output mask    \n".format(reg=self.regset.out.cfg_msk) +
             "cfg_val    = 0x{reg:08x} = {reg:10d}  # value/polarity \n".format(reg=self.regset.out.cfg_val)
         )
 
@@ -59,17 +59,13 @@ class lg_out (object):
         self.regset.out.cfg_oen[1] = value[1]
 
     @property
-    def mode(self) -> int:
-        """Output mode.
-           Each bit controls one of the output signals:
-               0 - output data comes from ASG
-               1 - output data comes from cfg_val register
-        """
-        return self.regset.out.cfg_mod
+    def mask(self) -> int:
+        """Output mask."""
+        return self.regset.out.cfg_msk
 
-    @mode.setter
-    def mode(self, value: int):
-        self.regset.out.cfg_mod = value
+    @mask.setter
+    def mask(self, value: int):
+        self.regset.out.cfg_msk = value
 
     @property
     def value(self) -> int:

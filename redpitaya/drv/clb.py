@@ -4,10 +4,13 @@ from .uio import uio
 
 
 class clb(uio):
+    _filters_dafault = { 1 : (0x7D93, 0x437C7, 0x2666,0xd9999a),
+            20: (0x4C5F, 0x2F38B, 0x2666,0xd9999a)}
     channels_dac = range(2)
     channels_adc = range(2)
 
     _MAGIC = 0xAABBCCDD
+    _MAGIC2 = 0xDDCCBBAA
     _eeprom_device = "/sys/bus/i2c/devices/0-0050/eeprom"
     _eeprom_offset_user    = 0x0008
     _eeprom_offset_factory = 0x1c08
@@ -25,7 +28,11 @@ class clb(uio):
         class _clb_range_t(Structure):
             class _clb_channel_t(Structure):
                 _fields_ = [('gain'  , c_float),  # multiplication
-                            ('offset', c_float)]  # summation
+                            ('offset', c_float),
+                            ('fil_aa', c_uint32),
+                            ('fil_bb', c_uint32),
+                            ('fil_pp', c_uint32),
+                            ('fil_kk', c_uint32)]  # summation
             _fields_ = [('lo', _clb_channel_t),  #  1.0V range
                         ('hi', _clb_channel_t)]  # 20.0V range
         _fields_ = [('dac', _clb_range_t._clb_channel_t * 2),  # generator
@@ -39,7 +46,9 @@ class clb(uio):
                     ('dac_gain'     , c_uint32 * 2),
                     ('dac_offset'   ,  c_int32 * 2),
                     ('magic'        , c_uint32    ),
-                    ('adc_hi_offset',  c_int32 * 2)]
+                    ('adc_hi_offset',  c_int32 * 2),
+                    ('low_filt'     , c_uint32 * 8),
+                    ('hi_filt'      , c_uint32 * 8)]
 
     def __init__(self, uio: str = '/dev/uio/clb'):
         super().__init__(uio)
@@ -49,6 +58,9 @@ class clb(uio):
         self.adc = [self.ADC(self.regset.adc[ch]) for ch in self.channels_adc]
 
     def __del__(self):
+        del(self.regset)
+        del(self.dac)
+        del(self.adc)
         super().__del__()
 
     def default(self):
@@ -170,26 +182,46 @@ class clb(uio):
 
         # convert EEPROM values into local float values
         for ch in self.channels_adc:
-            if (eeprom_struct.magic == self._MAGIC):
+            if (eeprom_struct.magic == self._MAGIC  or eeprom_struct.magic == self._MAGIC2):
                 clb_struct.adc[ch].lo.gain = self.FullScaleToVoltage(eeprom_struct.adc_lo_gain  [ch]) / 20.0
                 clb_struct.adc[ch].hi.gain = self.FullScaleToVoltage(eeprom_struct.adc_hi_gain  [ch])
             else:
                 clb_struct.adc[ch].lo.gain = self.FullScaleToVoltage(eeprom_struct.adc_hi_gain  [ch])
                 clb_struct.adc[ch].hi.gain = self.FullScaleToVoltage(eeprom_struct.adc_lo_gain  [ch]) / 20.0
-            clb_struct.adc[ch].lo.offset   =                         eeprom_struct.adc_lo_offset[ch]  / (2**13-1)
-            if (eeprom_struct.magic == self._MAGIC):
-                clb_struct.adc[ch].hi.offset =                       eeprom_struct.adc_hi_offset[ch]  / (2**13-1) * 20.0
+            clb_struct.adc[ch].lo.offset   =                         (eeprom_struct.adc_lo_offset[ch] * 4)  #/ (2**13-1) * 0
+            if (eeprom_struct.magic == self._MAGIC  or eeprom_struct.magic == self._MAGIC2):
+                clb_struct.adc[ch].hi.offset =                       (eeprom_struct.adc_hi_offset[ch] * 4)  # / (2**13-1) * 20.0
             else:
-                clb_struct.adc[ch].hi.offset = clb_struct.adc[ch].lo.offset
+                clb_struct.adc[ch].hi.offset = clb_struct.adc[ch].lo.offset 
         for ch in self.channels_dac:
-            clb_struct.dac[ch].gain      = self.FullScaleToVoltage (eeprom_struct.dac_gain     [ch])
-            clb_struct.dac[ch].offset    =                          eeprom_struct.dac_offset   [ch]  / (2**13-1)
+            clb_struct.dac[ch].gain      = 1 / self.FullScaleToVoltage (eeprom_struct.dac_gain     [ch])
+            clb_struct.dac[ch].offset    =                          (eeprom_struct.dac_offset   [ch] * 4)  # / (2**13-1)
 
         # missing magic number means a deprecated EEPROM structure was still not updated
-        if (eeprom_struct.magic != self._MAGIC):
+        if (eeprom_struct.magic != self._MAGIC and eeprom_struct.magic != self._MAGIC2):
             for ch in self.channels_adc:
                 clb_struct.adc[ch].hi.offset = clb_struct.adc[ch].lo.offset
-
+        if (eeprom_struct.magic == self._MAGIC2):
+            for ch in self.channels_adc:
+                clb_struct.adc[ch].lo.fil_aa = eeprom_struct.low_filt[ch * 4]
+                clb_struct.adc[ch].lo.fil_bb = eeprom_struct.low_filt[ch * 4 + 1]
+                clb_struct.adc[ch].lo.fil_pp = eeprom_struct.low_filt[ch * 4 + 2]
+                clb_struct.adc[ch].lo.fil_kk = eeprom_struct.low_filt[ch * 4 + 3]
+                clb_struct.adc[ch].hi.fil_aa = eeprom_struct.hi_filt[ch * 4]
+                clb_struct.adc[ch].hi.fil_bb = eeprom_struct.hi_filt[ch * 4 + 1]
+                clb_struct.adc[ch].hi.fil_pp = eeprom_struct.hi_filt[ch * 4 + 2]
+                clb_struct.adc[ch].hi.fil_kk = eeprom_struct.hi_filt[ch * 4 + 3]
+        else:
+            for ch in self.channels_adc:
+                clb_struct.adc[ch].lo.fil_aa = self._filters_dafault[1][0]
+                clb_struct.adc[ch].lo.fil_bb = self._filters_dafault[1][1]
+                clb_struct.adc[ch].lo.fil_pp = self._filters_dafault[1][2]
+                clb_struct.adc[ch].lo.fil_kk = self._filters_dafault[1][3]
+                clb_struct.adc[ch].hi.fil_aa = self._filters_dafault[20][0]
+                clb_struct.adc[ch].hi.fil_bb = self._filters_dafault[20][1]
+                clb_struct.adc[ch].hi.fil_pp = self._filters_dafault[20][2]
+                clb_struct.adc[ch].hi.fil_kk = self._filters_dafault[20][3]
+            
         return clb_struct
 
     def calib_show (self, clb_struct):
@@ -198,9 +230,32 @@ class clb(uio):
             print('adc[{}].hi.gain   = {}'.format(ch, clb_struct.adc[ch].hi.gain))
             print('adc[{}].lo.offset = {}'.format(ch, clb_struct.adc[ch].lo.offset))
             print('adc[{}].hi.offset = {}'.format(ch, clb_struct.adc[ch].hi.offset))
+            print('adc[{}].lo.filter_aa = {}'.format(ch, clb_struct.adc[ch].lo.fil_aa))
+            print('adc[{}].lo.filter_bb = {}'.format(ch, clb_struct.adc[ch].lo.fil_bb))
+            print('adc[{}].lo.filter_pp = {}'.format(ch, clb_struct.adc[ch].lo.fil_pp))
+            print('adc[{}].lo.filter_kk = {}'.format(ch, clb_struct.adc[ch].lo.fil_kk))
+            print('adc[{}].hi.filter_aa = {}'.format(ch, clb_struct.adc[ch].hi.fil_aa))
+            print('adc[{}].hi.filter_bb = {}'.format(ch, clb_struct.adc[ch].hi.fil_bb))
+            print('adc[{}].hi.filter_pp = {}'.format(ch, clb_struct.adc[ch].hi.fil_pp))
+            print('adc[{}].hi.filter_kk = {}'.format(ch, clb_struct.adc[ch].hi.fil_kk))
         for ch in self.channels_dac:
             print('dac[{}].gain      = {}'.format(ch, clb_struct.dac[ch].gain))
             print('dac[{}].offset    = {}'.format(ch, clb_struct.dac[ch].offset))
+
+    def calib_dac_apply (self, clb_struct):
+        for ch in self.channels_dac:
+            self.dac[ch].gain   = clb_struct.dac[ch].gain
+            self.dac[ch].offset = clb_struct.dac[ch].offset
+
+    def calib_adc_apply (self, clb_struct, ch: int, input_range: float):
+        if   (input_range == 1):
+            self.adc[ch].gain   = clb_struct.adc[ch].lo.gain
+            self.adc[ch].offset = clb_struct.adc[ch].lo.offset
+        elif (input_range == 20):
+            self.adc[ch].gain   = clb_struct.adc[ch].hi.gain
+            self.adc[ch].offset = clb_struct.adc[ch].hi.offset
+        else:
+            raise ValueError("ADC range can be one of [ 1, 20 ].")
 
     def calib_apply (self, clb_struct, adc_range = ['lo', 'lo']):
         for ch in self.channels_adc:

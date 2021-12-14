@@ -84,7 +84,7 @@ class uio(object):
         return uio_mmap
 
     def __del__(self):
-        print('UIO __del__ was activated.')
+        # print('UIO __del__ was activated.')
         # close memory mappings
         for uio_mmap in self.uio_mmaps:
             uio_mmap.close()

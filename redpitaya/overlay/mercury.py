@@ -68,7 +68,7 @@ class mercury(overlay):
     class analog_in():
         channels = {0: 'vaux8', 1: 'vaux0', 2: 'vaux1', 3: 'vaux9'}
         ctx = iio.Context()
-        dev = ctx.devices[3]
+        dev = ctx.devices[0]
         # resistor divider
         resdiv = 4.99 / (30.0 + 4.99)
 
@@ -106,6 +106,11 @@ class mercury(overlay):
 
     class gen(gen):
         def __init__(self, index: int):
+            self.calib = clb()
+            self.eeprom_user = self.calib.eeprom_read()
+            self.calib_user = self.calib.eeprom_parse(self.eeprom_user)
+            self.calib.calib_dac_apply(self.calib_user)
+            del(self.calib)
             if index in range(mercury._MNG):
                 super().__init__(index=index)
                 self.sync_src = mercury.sync_src['gen'+str(index)]
@@ -114,10 +119,23 @@ class mercury(overlay):
 
     class osc(osc):
         def __init__(self, index: int, input_range: float):
+            self.calib = clb()
+            self.eeprom_user = self.calib.eeprom_read()
+            self.calib_user = self.calib.eeprom_parse(self.eeprom_user)
+            self.calib.calib_adc_apply(self.calib_user,index,input_range)
+            #self.calib.calib_show(self.calib_user)
+            del(self.calib)            
             if index in range(mercury._MNO):
                 super().__init__(index=index, input_range=input_range)
                 self.sync_src = mercury.sync_src['osc'+str(index)]
                 self.trig_src = mercury.trig_src['osc'+str(index)]
+                if (input_range == 1.0):
+                    fil_cof = self.calib_user.adc[index].lo
+                    self.filter_coeficients = (fil_cof.fil_aa,fil_cof.fil_bb,fil_cof.fil_kk,fil_cof.fil_pp)
+                else:
+                    fil_cof = self.calib_user.adc[index].hi
+                    self.filter_coeficients = (fil_cof.fil_aa,fil_cof.fil_bb,fil_cof.fil_kk,fil_cof.fil_pp)
+            #    self.show_regset()
             else:
                 raise ValueError("Oscilloscope index should be one of {}".format(range(mercury._MNO)))
 
