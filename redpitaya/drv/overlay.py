@@ -6,37 +6,27 @@ class overlay(object):
     """Class handling device tree overlays and FPGA bitstreams."""
     overlays = "/sys/kernel/config/device-tree/overlays"
     fpgapath = "/opt/redpitaya/fpga"
+    overlaysh = "/opt/redpitaya/sbin/overlay.sh"
 
     def __init__(self, overlay: str):
         if not isinstance(overlay, str):
             raise TypeError("Bitstream name has to be a string.")
 
-        dtbo = "{}/{}/fpga.dtbo".format(self.fpgapath, overlay)
-        bit  = "{}/{}/fpga.bit".format(self.fpgapath, overlay)
-
-        if os.path.isfile(dtbo):
+        if os.path.isfile(self.overlaysh):
             self.overlay = overlay
             self.syspath = "{}/{}".format(self.overlays, self.overlay)
-        else:
-            raise IOError('Device tree overlay source {} does not exist.'.format(dtbo))
-
-        # if it does not exists create overlay directory
-        if not os.path.isdir(self.syspath):
-            os.system("mkdir {}".format(self.syspath))
 
         if self.status():
-            print('Requested overlay is already loaded.')
-            # TODO: issuing a working does not work as expected,
-            # since __init__ does not finish properly, __del__ is run
-            # and the overlay is removed, which is not the intention
-            # raise ResourceWarning('Requested overlay is already loaded.')
+            print('Check FPGA [OK].')
+            return
+
+        os.system("{} {}".format(self.overlaysh,overlay))
+        # this delay makes sure all devices are created before continuing
+        time.sleep(0.5)
+        if self.status():
+            print('Load overlay [OK].')
         else:
-            # os.system("dtc -I dts -O dtb -o {0}.dtbo -@ {0}.dts".format(self.overlay))
-            # TODO: loading FPGA should be handled by device tree overlay
-            os.system("cat {} > /dev/xdevcfg".format(bit))
-            os.system("cat {} > {}/dtbo".format(dtbo, self.syspath))
-            # this delay makes sure all devices are created before continuing
-            time.sleep(0.5)
+            print('Load overlay [FAIL].')
 
     def __del__(self):
         print('Overlay __del__ was activated.')
@@ -51,11 +41,17 @@ class overlay(object):
         :returns: device tree overlay 'applied' status
         :rtype: bool
         """
-        if not os.path.exists(self.syspath):
+        if not os.path.isfile('/tmp/loaded_fpga.inf'):
             return False
         else:
-            with open('{}/status'.format(self.syspath), 'r') as status_file:
+            with open('/tmp/loaded_fpga.inf', 'r') as status_file:
+                status_string = status_file.read()
+                if   (status_string !=   self.overlay): return False
+
+        if not os.path.isfile('{}/Full/status'.format(self.overlays)):
+            return False
+        else:
+            with open('{}/Full/status'.format(self.overlays), 'r') as status_file:
                 status_string = status_file.read()
                 if   (status_string ==   "applied\n"): return True
-                elif (status_string == "unapplied\n"): return False
-                else:                                  return None
+                else:                                  return False

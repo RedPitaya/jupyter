@@ -132,6 +132,9 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
             ptr = int(self.pointer)
         adr = (self.buffer_size + ptr - siz) % self.buffer_size
         scale = self.__input_range / float(self._DWr)
-        # TODO: avoid making copy of entire array
-        wave = np.roll(self.buffer, -ptr)
-        return (wave.astype('float32')[-siz:] * scale)
+
+        ret = []
+        for i in range(siz):
+            ret.append(self.buffer[(i + ptr) % self.buffer_size] * scale)
+
+        return ret

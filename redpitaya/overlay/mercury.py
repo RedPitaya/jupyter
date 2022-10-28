@@ -53,22 +53,23 @@ class mercury(overlay):
             else:
                 super().__init__(name="led"+str(index), brightness=brightness)
 
-    class gpio(GPIO):
-        ports = {'p': 968, 'n': 976}
-        gpios = range(8)
+    class gpio():
 
-        def __init__(self, port, pin, direction="preserve"):
-            if port not in self.ports:
-                raise ValueError("GPIO port should be one of: {}".format(self.ports))
-            if pin not in self.gpios:
-                raise ValueError("GPIO pin should be one of: {}".format(self.gpios))
+        def __new__(cls, port, pin, direction="preserve"):
+            ports = {'p': 968, 'n': 976}
+            gpios = range(8)
+
+            if port not in ports:
+                raise ValueError("GPIO port should be one of: {}".format(ports))
+            if pin not in gpios:
+                raise ValueError("GPIO pin should be one of: {}".format(gpios))
             else:
-                super().__init__(pin=self.ports[port] + pin, direction=direction)
+                return GPIO(ports[port] + pin,direction)
 
     class analog_in():
-        channels = {0: 'vaux8', 1: 'vaux0', 2: 'vaux1', 3: 'vaux9'}
+        channels = {0: 'voltage9', 1: 'voltage11', 2: 'voltage10', 3: 'voltage8'}
         ctx = iio.Context()
-        dev = ctx.devices[0]
+        dev = ctx.devices[1]
         # resistor divider
         resdiv = 4.99 / (30.0 + 4.99)
 
@@ -124,7 +125,7 @@ class mercury(overlay):
             self.calib_user = self.calib.eeprom_parse(self.eeprom_user)
             self.calib.calib_adc_apply(self.calib_user,index,input_range)
             #self.calib.calib_show(self.calib_user)
-            del(self.calib)            
+            del(self.calib)
             if index in range(mercury._MNO):
                 super().__init__(index=index, input_range=input_range)
                 self.sync_src = mercury.sync_src['osc'+str(index)]
