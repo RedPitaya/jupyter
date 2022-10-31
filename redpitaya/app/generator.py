@@ -55,11 +55,11 @@ class generator (object):
         duty = 0.5
 
         def set_waveform (self):
-            if   self.form is 'sin':
+            if   self.form == 'sin':
                 self.waveform = self.sin()
-            elif self.form is 'square':
+            elif self.form == 'square':
                 self.waveform = self.square(self.duty)
-            elif self.form is 'sawtooth':
+            elif self.form == 'sawtooth':
                 self.waveform = self.sawtooth(self.duty)
 
         def __init__ (self, ch):
