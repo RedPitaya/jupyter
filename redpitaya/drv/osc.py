@@ -109,6 +109,7 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
         adr = cnt % self.buffer_size
         return adr
 
+
     def data(self, siz: int = buffer_size, ptr: int = None) -> np.array:
         """Data.
 
@@ -130,11 +131,19 @@ class osc(evn, acq, osc_trg, osc_fil, uio):
         """
         if ptr is None:
             ptr = int(self.pointer)
-        adr = (self.buffer_size + ptr - siz) % self.buffer_size
         scale = self.__input_range / float(self._DWr)
 
-        ret = []
-        for i in range(siz):
-            ret.append(self.buffer[(i + ptr) % self.buffer_size] * scale)
+        buffer_np = np.ctypeslib.as_array(self.buffer)
+        buffer_size = len(self.buffer)
 
-        return ret
+        # get `siz`-segment by start and exlusive-end pointers
+        start = ptr
+        end = (ptr + siz) % buffer_size
+        if start < end:
+            return scale * buffer_np[start:end]
+        else:  # wrap around
+            head_length = buffer_size - start
+            segment = np.empty(head_length + end)
+            segment[:head_length] = buffer_np[start:]
+            segment[head_length:] = buffer_np[:end]
+            return scale * segment
