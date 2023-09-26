@@ -377,7 +377,11 @@ epub_exclude_files = ['search.html']
 # If false, no index is generated.
 #epub_use_index = True
 
-
+### NBSPHINX ###
+# To render Jupyter Notebooks in Sphinx in other formats (Myst)
+#nbsphinx_custom_formats = {
+#    ".md": ["jupytext.reads", {"fmt": "mystnb"}],
+#}
 
 
 
