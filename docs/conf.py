@@ -37,6 +37,8 @@ extensions = [
     'sphinx.ext.todo',
     'sphinx.ext.viewcode',
     'sphinxcontrib.wavedrom',
+    'nbsphinx',
+    'sphinx_gallery.load_style',
 ]
 
 # autodoc settings
@@ -64,7 +66,7 @@ master_doc = 'index'
 # General information about the project.
 project = u'Red Pitaya Jupyter'
 title = u'Red Pitaya Jupyter Documentation'
-copyright = u'2017, Red Pitaya d.d.'
+copyright = u'2023, Red Pitaya d.o.o.'
 author = u'Red Pitaya'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -72,7 +74,7 @@ author = u'Red Pitaya'
 # built documents.
 #
 # The short X.Y version.
-version = u'0.97'
+version = u'2.00'
 # The full version, including alpha/beta/rc tags.
 release = version
 
@@ -374,3 +376,8 @@ epub_exclude_files = ['search.html']
 
 # If false, no index is generated.
 #epub_use_index = True
+
+
+
+
+
