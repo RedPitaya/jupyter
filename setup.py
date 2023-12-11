@@ -16,7 +16,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.98',
+    version='2.00',
 
     description='Red Pitaya Python drivers and Jupyter applications',
     long_description=long_description,
@@ -36,17 +36,17 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Stable',
 
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Drivers',
 
         'License :: OSI Approved :: MIT License',
 
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.10',
     ],
 
-    keywords='oscilloscope generator',
+    keywords='signal generation acquisition GPIO control',
     packages=['redpitaya'],
     install_requires=['numpy', 'scipy', 'bokeh', 'IPython', 'ipywidgets'],
 )
