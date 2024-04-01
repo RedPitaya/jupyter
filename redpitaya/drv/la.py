@@ -104,6 +104,7 @@ class la(evn, acq, la_trg, la_rle, la_msk, uio):
         if ptr is None:
             ptr = int(self.pointer)
         adr = (self.buffer_size + ptr - siz) % self.buffer_size
-        # TODO: avoid making copy of entire array
-        wave = np.roll(self.buffer, -ptr)
-        return wave.astype('uint16')[-siz:]
+        ret = []
+        for i in range(siz):
+            ret.append(self.buffer[(i + ptr) % self.buffer_size])
+        return ret
