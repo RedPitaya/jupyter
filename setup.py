@@ -43,10 +43,16 @@ setup(
 
         'License :: OSI Approved :: MIT License',
 
-        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.12',
     ],
 
     keywords='signal generation acquisition GPIO control',
     packages=['redpitaya'],
-    install_requires=['numpy', 'scipy', 'bokeh', 'IPython', 'ipywidgets'],
+    install_requires=[
+    'numpy==2.4.1',      
+    'scipy==1.17.0',   
+    'bokeh==3.8.2',      
+    'IPython==9.9.0',   
+    'ipywidgets==8.1.8',
+    ],
 )
