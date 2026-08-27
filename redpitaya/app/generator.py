@@ -10,7 +10,6 @@ import numpy as np
 from bokeh.io import push_notebook, show, output_notebook
 from bokeh.models import HoverTool, Range1d
 from bokeh.plotting import figure
-from bokeh.layouts import widgetbox
 from bokeh.resources import INLINE
 
 # widgets

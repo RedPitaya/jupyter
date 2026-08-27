@@ -10,7 +10,6 @@ import numpy as np
 from bokeh.io import push_notebook, show, output_notebook
 from bokeh.models import HoverTool, Range1d, LinearAxis
 from bokeh.plotting import figure
-from bokeh.layouts import widgetbox
 from bokeh.resources import INLINE
 
 # widgets
@@ -96,7 +95,7 @@ class oscilloscope (object):
 
         colors = ('red', 'blue')
         tools = "pan,wheel_zoom,box_zoom,reset,crosshair"
-        self.p = figure(plot_height=500, plot_width=900, title="oscilloscope", toolbar_location="above", tools=(tools))
+        self.p = figure(height=500, width=900, title="oscilloscope", toolbar_location="above", tools=(tools))
         self.p.xaxis.axis_label = 'time [s]'
         #self.p.yaxis.axis_label = 'voltage [V]'
         self.p.x_range = Range1d(self.x[0], self.x[-1])

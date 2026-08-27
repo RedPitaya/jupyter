@@ -49,10 +49,10 @@ setup(
     keywords='signal generation acquisition GPIO control',
     packages=['redpitaya'],
     install_requires=[
-    'numpy==2.4.1',      
-    'scipy==1.17.0',   
-    'bokeh==3.8.2',      
-    'IPython==9.9.0',   
-    'ipywidgets==8.1.8',
+    'numpy==2.4.6',
+    'scipy==1.17.1',
+    'bokeh==3.9.2',
+    'IPython==9.16.1',
+    'ipywidgets==8.1.9',
     ],
 )
